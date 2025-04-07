@@ -341,4 +341,3 @@ public class GameControler : MonoBehaviour
         canPassStage = true; // Libera novamente para passar de fase
     }
 }
-
