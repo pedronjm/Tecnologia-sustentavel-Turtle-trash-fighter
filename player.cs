@@ -13,6 +13,17 @@ public class Player : MonoBehaviour
     public float dashforce;           // Força aplicada no Dash
     private bool isDashing;           // Controla se o jogador está no Dash
 
+
+    [Header("Combat")]
+public Transform attackPoint;
+public float attackRange = 0.5f;
+public int attackDamage = 1;
+public float attackCooldown = 0.3f;
+private float attackTimer;
+
+public LayerMask enemyLayer;
+
+
     // Áudio
     public AudioSource audioSource;
     public AudioClip walkinggrass;
@@ -48,7 +59,33 @@ public class Player : MonoBehaviour
         Jump();  // Pulo do jogador
         Dash();  // Dash do jogador
         }
+        Attack();
+
     }
+
+    void Attack()
+{
+    attackTimer -= Time.deltaTime;
+
+    if (Input.GetButtonDown("Fire1") && attackTimer <= 0)
+    {
+        anim.SetTrigger("attack");
+
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            attackRange,
+            enemyLayer
+        );
+
+        foreach (Collider2D enemy in enemies)
+        {
+            enemy.GetComponent<Damageable>()?.TakeDamage(attackDamage, transform.position);
+        }
+
+        attackTimer = attackCooldown;
+    }
+}
+
 
     void Move()
     {
@@ -228,4 +265,10 @@ public class Player : MonoBehaviour
             isJumping = true;
         }
     }
+    void OnDrawGizmosSelected()
+{
+    if (attackPoint == null) return;
+    Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+}
+
 }
