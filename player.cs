@@ -24,13 +24,13 @@ private float attackTimer;
 public LayerMask enemyLayer;
 
 
-    // Áudio
-    public AudioSource audioSource;
-    public AudioClip walkinggrass;
-    public AudioClip runningstone;
-    public AudioClip jumpSound;
-    public AudioClip dashSound;
-    public AudioClip deathSound;
+    // // Áudio
+    // public AudioSource audioSource;
+    // public AudioClip walkinggrass;
+    // public AudioClip runningstone;
+    // public AudioClip jumpSound;
+    // public AudioClip dashSound;
+    // public AudioClip deathSound;
 
     // Componentes
     private Rigidbody2D rig;
@@ -113,31 +113,31 @@ public LayerMask enemyLayer;
         }
     }
 
-    void PlayWalkingSound()
-    {
-        if (!audioSource.isPlaying && !isJumping)
-        {
-            if (GameControler.instance.fase == 1 || GameControler.instance.fase == 3)
-            {
-                audioSource.clip = walkinggrass;
-            }
-            else
-            {
-                audioSource.clip = runningstone;
-            }
-            audioSource.loop = true;
-            audioSource.Play();
-        }
-    }
+    // void PlayWalkingSound()
+    // {
+    //     if (!audioSource.isPlaying && !isJumping)
+    //     {
+    //         if (GameControler.instance.fase == 1 || GameControler.instance.fase == 3)
+    //         {
+    //             audioSource.clip = walkinggrass;
+    //         }
+    //         else
+    //         {
+    //             audioSource.clip = runningstone;
+    //         }
+    //         audioSource.loop = true;
+    //         audioSource.Play();
+    //     }
+    // }
 
-    void StopWalkingSound()
-    {
-        if (audioSource.isPlaying )
-        {
-            audioSource.loop = false;
-            audioSource.Stop();
-        }
-    }
+    // void StopWalkingSound()
+    // {
+    //     if (audioSource.isPlaying )
+    //     {
+    //         audioSource.loop = false;
+    //         audioSource.Stop();
+    //     }
+    // }
 
     void Jump()
     {
@@ -149,7 +149,7 @@ public LayerMask enemyLayer;
                 doubleJump = true;
                 anim.SetBool("jump", true);
                 pulo++;
-                PlayJumpSound();
+               // PlayJumpSound();
             }
             else if (doubleJump)
             {
@@ -159,26 +159,26 @@ public LayerMask enemyLayer;
                 pulodlp++;
                 anim.SetBool("jump", true);
                 
-                PlayJumpSound();
+              //  PlayJumpSound();
                 StartCoroutine(jumpanima());
             }
         }
     }
 
-    void PlayJumpSound()
-    {
-        // Reproduz o som de pulo sem interferir nos sons de caminhada ou Dash
-        if (audioSource.clip != jumpSound || !audioSource.isPlaying)
-        {
-            audioSource.Stop(); // Interrompe o som atual para evitar sobreposição
-            audioSource.clip = jumpSound;
-            audioSource.loop = false; // Som de pulo não deve ser em loop
-            audioSource.Play(); // Reproduz o som de pulo
-        }else if (audioSource.clip == jumpSound){
-             audioSource.Play(); // Reproduz o som de pulo
-        }
+    // void PlayJumpSound()
+    // {
+    //     // Reproduz o som de pulo sem interferir nos sons de caminhada ou Dash
+    //     if (audioSource.clip != jumpSound || !audioSource.isPlaying)
+    //     {
+    //         audioSource.Stop(); // Interrompe o som atual para evitar sobreposição
+    //         audioSource.clip = jumpSound;
+    //         audioSource.loop = false; // Som de pulo não deve ser em loop
+    //         audioSource.Play(); // Reproduz o som de pulo
+    //     }else if (audioSource.clip == jumpSound){
+    //          audioSource.Play(); // Reproduz o som de pulo
+    //     }
 
-    }
+    // }
 
     void Dash()
     {
@@ -190,7 +190,7 @@ public LayerMask enemyLayer;
 
         if (Input.GetButtonDown("dash") && !isDashing)
         {
-            audioSource.PlayOneShot(dashSound);
+           // audioSource.PlayOneShot(dashSound);
             dsh++; // Incrementa o contador de Dash
             StartCoroutine(PerformDash());
         }

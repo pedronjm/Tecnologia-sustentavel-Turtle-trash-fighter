@@ -5,42 +5,42 @@ using UnityEngine.SceneManagement;
 
 public class GameControler : MonoBehaviour
 {
-    // Textos na tela
-    public Text garrafa;
-    public Text engrenagem;
-    public Text maca;
-    public Text circuito;
-    public Text walk;
+    // // Textos na tela
+    // public Text garrafa;
+    // public Text engrenagem;
+    // public Text maca;
+    // public Text circuito;
+    // public Text walk;
 
-    // Objetos
-    public GameObject Gameover;
-    public GameObject DICAS;
-    public GameObject ganhou;
-    public GameObject vida;
-    public GameObject hudvida;
-    public GameObject inicio;
-    public GameObject notCollected;
-    public GameObject coletavel;
+    // // Objetos
+    // public GameObject Gameover;
+    // public GameObject DICAS;
+    // public GameObject ganhou;
+    // public GameObject vida;
+    // public GameObject hudvida;
+    // public GameObject inicio;
+    // public GameObject notCollected;
+    // public GameObject coletavel;
     public GameObject jogador;
 
-    // Coletáveis
-    public float qttgarrafa;
-    public float qttengrenagem;
-    public float qttmaca;
-    public float qttcircuito;
-    public float rstgarrafa;
-    public float rstengrenagem;
-    public float rstmaca;
-    public float rstcircuito;
+    // // Coletáveis
+    // public float qttgarrafa;
+    // public float qttengrenagem;
+    // public float qttmaca;
+    // public float qttcircuito;
+    // public float rstgarrafa;
+    // public float rstengrenagem;
+    // public float rstmaca;
+    // public float rstcircuito;
 
-    // Áudios
-    public AudioSource audioSource;
-    public AudioClip coletar;
-    public AudioClip jogarfora;
-    public AudioClip stepcomplete;
-    public AudioClip tutorialcomplete;
-    public AudioClip fasecomplete;
-    public AudioClip heal;
+    // // Áudios
+    // public AudioSource audioSource;
+    // public AudioClip coletar;
+    // public AudioClip jogarfora;
+    // public AudioClip stepcomplete;
+    // public AudioClip tutorialcomplete;
+    // public AudioClip fasecomplete;
+    // public AudioClip heal;
 
 
 
