@@ -2,20 +2,26 @@ using UnityEngine;
 
 public class Damageable : MonoBehaviour
 {
-    public int health = 3;
-    public Rigidbody2D rb;
-    public float knockbackForce = 5f;
+    public int health = 1;
+    private sacola inimigoScript;
 
-    public void TakeDamage(int damage, Vector2 attackerPosition)
+    void Start()
+    {
+        inimigoScript = GetComponent<sacola>();
+    }
+
+    public void TakeDamage(int damage, Vector2 attackPosition)
     {
         health -= damage;
 
-        Vector2 dir = (transform.position - (Vector3)attackerPosition).normalized;
-        rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
-
         if (health <= 0)
         {
-            Destroy(gameObject);
+            inimigoScript.Die();
+        }
+        else
+        {
+            // Opcional: Adicionar um coice (knockback) ao receber dano
+            inimigoScript.ApplyKnockback(attackPosition);
         }
     }
 }

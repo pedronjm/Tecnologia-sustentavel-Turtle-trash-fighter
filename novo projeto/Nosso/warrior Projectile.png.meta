@@ -1,0 +1,481 @@
+fileFormatVersion: 2
+guid: 7a6eb19ce1af5f84db189a797b32a111
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8498835031240097434
+    second: warrior Projectile_0
+  - first:
+      213: 713221495943736820
+    second: warrior Projectile_1
+  - first:
+      213: -6831808332283887956
+    second: warrior Projectile_2
+  - first:
+      213: -4676174499824104538
+    second: warrior Projectile_3
+  - first:
+      213: -7540227288371487302
+    second: warrior Projectile_4
+  - first:
+      213: -6929151226543740844
+    second: warrior Projectile_5
+  - first:
+      213: -5292050076875367677
+    second: warrior Projectile_6
+  - first:
+      213: -1585121137215784094
+    second: warrior Projectile_7
+  - first:
+      213: -8824400503295047854
+    second: warrior Projectile_8
+  - first:
+      213: -441716236234692009
+    second: warrior Projectile_9
+  - first:
+      213: -3990393841651089596
+    second: warrior Projectile_10
+  - first:
+      213: -1813363602495473028
+    second: warrior Projectile_11
+  - first:
+      213: 8419290602478628647
+    second: warrior Projectile_12
+  - first:
+      213: -8104616092425601561
+    second: warrior Projectile_13
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: warrior Projectile_0
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 11
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 661c94e51921e0a80800000000000000
+      internalID: -8498835031240097434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_1
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 11
+        width: 18
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fd26e7fb2fd5e900800000000000000
+      internalID: 713221495943736820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 11
+        width: 18
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cae3aaca48a8031a0800000000000000
+      internalID: -6831808332283887956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_3
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 11
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ab8e3e5114ea1fb0800000000000000
+      internalID: -4676174499824104538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_4
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 11
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abd19e62b3bbb5790800000000000000
+      internalID: -7540227288371487302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_5
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 11
+        width: 20
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 458e5e2fba5b6df90800000000000000
+      internalID: -6929151226543740844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_6
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 11
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30bd34a5e7cde86b0800000000000000
+      internalID: -5292050076875367677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_7
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 11
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26b3a4a59b4800ae0800000000000000
+      internalID: -1585121137215784094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_8
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 11
+        width: 20
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2570255fe7e698580800000000000000
+      internalID: -8824400503295047854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_9
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 11
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75a65b76c65bed9f0800000000000000
+      internalID: -441716236234692009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_10
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 11
+        width: 20
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44ffa7a61f54f98c0800000000000000
+      internalID: -3990393841651089596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_11
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 11
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7a72a04963a5d6e0800000000000000
+      internalID: -1813363602495473028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_12
+      rect:
+        serializedVersion: 2
+        x: 391
+        y: 11
+        width: 20
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72fe585123457d470800000000000000
+      internalID: 8419290602478628647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior Projectile_13
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 11
+        width: 20
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7edbe02aa9e968f80800000000000000
+      internalID: -8104616092425601561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      warrior Projectile_0: -8498835031240097434
+      warrior Projectile_1: 713221495943736820
+      warrior Projectile_10: -3990393841651089596
+      warrior Projectile_11: -1813363602495473028
+      warrior Projectile_12: 8419290602478628647
+      warrior Projectile_13: -8104616092425601561
+      warrior Projectile_2: -6831808332283887956
+      warrior Projectile_3: -4676174499824104538
+      warrior Projectile_4: -7540227288371487302
+      warrior Projectile_5: -6929151226543740844
+      warrior Projectile_6: -5292050076875367677
+      warrior Projectile_7: -1585121137215784094
+      warrior Projectile_8: -8824400503295047854
+      warrior Projectile_9: -441716236234692009
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
