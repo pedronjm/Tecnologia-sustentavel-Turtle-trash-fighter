@@ -10,11 +10,17 @@ public abstract class Player : MonoBehaviour
     public bool isJumping;
     public bool doubleJump;
 
+    [Tooltip("Tempo minimo apos saltar para permitir reset por contato com o chao.")]
+    public float jumpResetDelay = 0.1f;
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public LayerMask groundLayer;
     public bool isGrounded;
     public float groundCheckRadius = 0.15f;
+
+    [Tooltip("Mantem o estado de chao por alguns milissegundos para evitar flicker.")]
+    public float groundedGraceTime = 0.08f;
 
     [Header("Dash")]
     public float auxDashCooldown = 1f;
@@ -28,11 +34,16 @@ public abstract class Player : MonoBehaviour
     public float wallCheckRadius = 0.12f;
     public float wallJumpForce = 12f;
     public float wallJumpControlLockTime = 0.15f;
+    public int maxJumps = 2;
     public bool debugWallSlide;
     protected bool isWallSliding;
     bool lastLoggedWallSlide;
+    bool jumpResetByWallContact;
     float wallJumpLockTimer;
     float wallDirection;
+    int jumpsUsed;
+    float jumpResetLockTimer;
+    float groundedGraceTimer;
 
     [Header("Components")]
     protected Rigidbody2D rig;
@@ -46,6 +57,9 @@ public abstract class Player : MonoBehaviour
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
 
+        // Regras do projeto: apenas pulo duplo (2 saltos no ar).
+        maxJumps = 2;
+
         if (groundCheck == null)
             groundCheck = transform;
 
@@ -54,6 +68,9 @@ public abstract class Player : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (jumpResetLockTimer > 0f)
+            jumpResetLockTimer -= Time.deltaTime;
+
         if (isDashing)
             return; // Trava outros inputs durante o Dash
 
@@ -76,14 +93,23 @@ public abstract class Player : MonoBehaviour
         Vector2 checkPosition =
             groundCheck != null ? (Vector2)groundCheck.position : (Vector2)transform.position;
 
-         isGrounded =
+        bool touchingGround =
             Physics2D.OverlapCircle(checkPosition, groundCheckRadius, groundLayer) != null;
 
-        if (!isGrounded)
+        if (touchingGround)
+            groundedGraceTimer = groundedGraceTime;
+        else
+            groundedGraceTimer -= Time.deltaTime;
+
+        isGrounded = groundedGraceTimer > 0f;
+
+        if (!isGrounded || jumpResetLockTimer > 0f)
             return;
 
         isJumping = false;
         doubleJump = false;
+        jumpsUsed = 0;
+        jumpResetByWallContact = false;
         isWallSliding = false;
         anim.SetBool("jump", false);
         anim.SetBool("doublejump", false);
@@ -145,7 +171,9 @@ public abstract class Player : MonoBehaviour
                 rig.linearVelocity = wallJumpVelocity;
                 isWallSliding = false;
                 isJumping = true;
+                jumpsUsed = 1;
                 doubleJump = true;
+                jumpResetLockTimer = jumpResetDelay;
                 wallJumpLockTimer = wallJumpControlLockTime;
 
                 anim.SetBool("wall", false);
@@ -159,14 +187,18 @@ public abstract class Player : MonoBehaviour
             if (!isJumping)
             {
                 rig.linearVelocity = new Vector2(rig.linearVelocity.x, JumpForce);
-                doubleJump = true;
+                jumpsUsed = 1;
                 isJumping = true;
+                doubleJump = true;
+                jumpResetLockTimer = jumpResetDelay;
                 anim.SetBool("jump", true);
             }
             else if (doubleJump)
             {
                 rig.linearVelocity = new Vector2(rig.linearVelocity.x, JumpForce);
+                jumpsUsed = 2;
                 doubleJump = false;
+                jumpResetLockTimer = jumpResetDelay;
                 anim.SetBool("jump", false);
                 anim.SetBool("doublejump", true);
                 StartCoroutine(StopDoubleJumpAnim());
@@ -190,10 +222,18 @@ public abstract class Player : MonoBehaviour
         isDashing = true;
         dashCooldown = auxDashCooldown;
         float dashDirection = transform.localScale.x > 0 ? 1 : -1;
+
+        if (sprite != null)
+            sprite.flipX = !sprite.flipX;
+
         rig.linearVelocity = new Vector2(dashDirection * dashforce, 0f);
         anim.SetBool("dash", true);
         yield return new WaitForSeconds(0.2f);
         anim.SetBool("dash", false);
+
+        if (sprite != null)
+            sprite.flipX = !sprite.flipX;
+
         isDashing = false;
     }
 
@@ -215,7 +255,21 @@ public abstract class Player : MonoBehaviour
         bool pressingTowardWall = (horizontal * direction) > 0f;
         bool isTouchingWall = wallCheck != null;
         bool canSlide = isTouchingWall && pressingTowardWall && !isGrounded;
-        
+
+        if (isTouchingWall)
+        {
+            if (!jumpResetByWallContact)
+            {
+                jumpsUsed = 0;
+                isJumping = false;
+                doubleJump = false;
+                jumpResetByWallContact = true;
+            }
+        }
+        else
+        {
+            jumpResetByWallContact = false;
+        }
 
         if (canSlide)
         {
@@ -247,7 +301,7 @@ public abstract class Player : MonoBehaviour
 
     void CheckFall()
     {
-        if (rig.linearVelocity.y < -0.1f && !isWallSliding)
+        if (!isGrounded && rig.linearVelocity.y < -0.15f && !isWallSliding)
         {
             anim.SetBool("fall", true);
             anim.SetBool("jump", false);
