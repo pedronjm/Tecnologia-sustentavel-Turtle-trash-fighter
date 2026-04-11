@@ -49,24 +49,29 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Nosso\codigos\engrenagem.cs" />
-    <Compile Include="Assets\Nosso\codigos\damageble.cs" />
-    <Compile Include="Assets\Nosso\codigos\EnemyHealthBar.cs" />
+    <Compile Include="Assets\Nosso\codigos\inimigos\enemy.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\EnemyState.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\HudColeveis.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\Maçã Pode.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\engrenagem.cs" />
     <Compile Include="Assets\Nosso\codigos\player\PlayerMage.cs" />
-    <Compile Include="Assets\Nosso\codigos\PlayerHealthBar.cs" />
+    <Compile Include="Assets\Nosso\codigos\inimigos\sacola.cs" />
+    <Compile Include="Assets\Nosso\codigos\combate\Projectile.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\EnemyHealthBar.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\ColetavelState.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\RemoteAuthSession.cs" />
     <Compile Include="Assets\Nosso\codigos\player\player.cs" />
-    <Compile Include="Assets\Nosso\codigos\sacola.cs" />
-    <Compile Include="Assets\Nosso\codigos\Coletavel.cs" />
-    <Compile Include="Assets\Nosso\codigos\circuito.cs" />
-    <Compile Include="Assets\Nosso\codigos\enemy.cs" />
-    <Compile Include="Assets\Nosso\codigos\garrafa.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\circuito.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\Coletavel.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\PlayerHealthBar.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\garrafa.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\RemoteSaveService.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\CheckpointState.cs" />
     <Compile Include="Assets\Nosso\codigos\player\PlayerWarrior.cs" />
     <Compile Include="Assets\Nosso\codigos\player\PlayerArcher.cs" />
-    <Compile Include="Assets\Nosso\codigos\Projectile.cs" />
-    <Compile Include="Assets\Nosso\codigos\GameControler.cs" />
-    <Compile Include="Assets\Nosso\codigos\Maçã Pode.cs" />
-    <Compile Include="Assets\Nosso\codigos\ColetavelState.cs" />
-    <Compile Include="Assets\Nosso\codigos\player\HudColeveis.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\GameControler.cs" />
+    <Compile Include="Assets\Nosso\codigos\combate\damageble.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\CheckpointTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

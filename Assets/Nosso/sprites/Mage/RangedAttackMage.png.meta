@@ -1,0 +1,481 @@
+fileFormatVersion: 2
+guid: 033a10db17d385e459c523a0c475a3df
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5116093571173173395
+    second: RangedAttackMage_0
+  - first:
+      213: 4257618991216070415
+    second: RangedAttackMage_1
+  - first:
+      213: -8277651202980263494
+    second: RangedAttackMage_2
+  - first:
+      213: -4037985113624295495
+    second: RangedAttackMage_3
+  - first:
+      213: -8799346764508596057
+    second: RangedAttackMage_4
+  - first:
+      213: -8341841325813935551
+    second: RangedAttackMage_5
+  - first:
+      213: 5668840053148224701
+    second: RangedAttackMage_6
+  - first:
+      213: -4363869952223582946
+    second: RangedAttackMage_7
+  - first:
+      213: 6619342912233782040
+    second: RangedAttackMage_8
+  - first:
+      213: -5386044284780325924
+    second: RangedAttackMage_9
+  - first:
+      213: 487135013230402391
+    second: RangedAttackMage_10
+  - first:
+      213: -8014700294161236559
+    second: RangedAttackMage_11
+  - first:
+      213: -4601658798803448580
+    second: RangedAttackMage_12
+  - first:
+      213: -3378013575602676438
+    second: RangedAttackMage_13
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: RangedAttackMage_0
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 10
+        width: 48
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 398cf6b2ff3000740800000000000000
+      internalID: 5116093571173173395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_1
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 39
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0f04682ae9161b30800000000000000
+      internalID: 4257618991216070415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_2
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 11
+        width: 48
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab9c6c77610ef1d80800000000000000
+      internalID: -8277651202980263494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_3
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 26
+        width: 19
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b7cb1eeee136f7c0800000000000000
+      internalID: -4037985113624295495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_4
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 37
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a87bf51db072e580800000000000000
+      internalID: -8799346764508596057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_5
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 11
+        width: 57
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 142df2ad283db3c80800000000000000
+      internalID: -8341841325813935551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_6
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 26
+        width: 9
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbc08685ef3cbae40800000000000000
+      internalID: 5668840053148224701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_7
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 11
+        width: 45
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1566b3366b6073c0800000000000000
+      internalID: -4363869952223582946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_8
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 11
+        width: 50
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81bb132de41acdb50800000000000000
+      internalID: 6619342912233782040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_9
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 11
+        width: 50
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd3552d624de045b0800000000000000
+      internalID: -5386044284780325924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_10
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 11
+        width: 56
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75bd04da6b6a2c600800000000000000
+      internalID: 487135013230402391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_11
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 11
+        width: 48
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bdfc41db8016c090800000000000000
+      internalID: -8014700294161236559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_12
+      rect:
+        serializedVersion: 2
+        x: 502
+        y: 24
+        width: 10
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfc05cff3bf9320c0800000000000000
+      internalID: -4601658798803448580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RangedAttackMage_13
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 14
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2d51cbec82ee11d0800000000000000
+      internalID: -3378013575602676438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      RangedAttackMage_0: 5116093571173173395
+      RangedAttackMage_1: 4257618991216070415
+      RangedAttackMage_10: 487135013230402391
+      RangedAttackMage_11: -8014700294161236559
+      RangedAttackMage_12: -4601658798803448580
+      RangedAttackMage_13: -3378013575602676438
+      RangedAttackMage_2: -8277651202980263494
+      RangedAttackMage_3: -4037985113624295495
+      RangedAttackMage_4: -8799346764508596057
+      RangedAttackMage_5: -8341841325813935551
+      RangedAttackMage_6: 5668840053148224701
+      RangedAttackMage_7: -4363869952223582946
+      RangedAttackMage_8: 6619342912233782040
+      RangedAttackMage_9: -5386044284780325924
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

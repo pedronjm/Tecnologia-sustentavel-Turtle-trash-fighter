@@ -52,26 +52,35 @@ TemporaryDependencyNodeTargetIdentifier=netstandard2.1
 /warnaserror+:NU1605
 
 [sourceFiles]
-Assets/Nosso/codigos/
+Assets/Nosso/codigos/coletaveis/
  circuito.cs
  Coletavel.cs
- ColetavelState.cs
- damageble.cs
- enemy.cs
- EnemyHealthBar.cs
  engrenagem.cs
- GameControler.cs
  garrafa.cs
  Maçã Pode.cs
- player/
-  HudColeveis.cs
-  player.cs
-  PlayerArcher.cs
-  PlayerMage.cs
-  PlayerWarrior.cs
- PlayerHealthBar.cs
+Assets/Nosso/codigos/combate/
+ damageble.cs
  Projectile.cs
+Assets/Nosso/codigos/inimigos/
+ enemy.cs
  sacola.cs
+Assets/Nosso/codigos/player/
+ player.cs
+ PlayerArcher.cs
+ PlayerMage.cs
+ PlayerWarrior.cs
+Assets/Nosso/codigos/sistema/
+ CheckpointState.cs
+ CheckpointTrigger.cs
+ ColetavelState.cs
+ EnemyState.cs
+ GameControler.cs
+ RemoteAuthSession.cs
+ RemoteSaveService.cs
+Assets/Nosso/codigos/ui/
+ EnemyHealthBar.cs
+ HudColeveis.cs
+ PlayerHealthBar.cs
 Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 
 [metadataReferences]

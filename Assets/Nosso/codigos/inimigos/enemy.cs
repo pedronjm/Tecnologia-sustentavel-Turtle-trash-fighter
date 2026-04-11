@@ -5,6 +5,10 @@ public class enemy : MonoBehaviour
     protected Rigidbody2D rig;
     protected Animator anim;
 
+    [Header("Save")]
+    [Tooltip("ID unico para persistencia de inimigos mortos. Se vazio, usa fallback por nome/posicao.")]
+    [SerializeField] private string saveId;
+
     [Header("Configurações de Movimento")]
     public float speed = 2f;
 
@@ -12,6 +16,17 @@ public class enemy : MonoBehaviour
 
     protected virtual void Start()
     {
+        if (EnemyState.instance != null)
+        {
+            EnemyState.instance.RegistrarInimigo(GetSaveId());
+
+            if (EnemyState.instance.EstaMorto(GetSaveId()))
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
         rig = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
     }
@@ -22,6 +37,10 @@ public class enemy : MonoBehaviour
             return;
 
         isDead = true;
+
+        if (EnemyState.instance != null)
+            EnemyState.instance.MarcarMorto(GetSaveId());
+
         speed = 0f;
 
         if (rig != null)
@@ -34,6 +53,15 @@ public class enemy : MonoBehaviour
             anim.SetTrigger("dano");
 
         Destroy(gameObject, 0.75f);
+    }
+
+    public string GetSaveId()
+    {
+        if (!string.IsNullOrEmpty(saveId))
+            return saveId;
+
+        Vector3 p = transform.position;
+        return $"{gameObject.scene.name}:{gameObject.name}:{Mathf.RoundToInt(p.x * 100f)}:{Mathf.RoundToInt(p.y * 100f)}";
     }
 
     public virtual void ApplyKnockback(Vector2 attackPos)
