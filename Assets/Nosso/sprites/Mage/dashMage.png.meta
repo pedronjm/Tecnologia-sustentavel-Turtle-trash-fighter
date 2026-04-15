@@ -1,0 +1,585 @@
+fileFormatVersion: 2
+guid: 59c6eb4c3cc51634a9859423fae4681b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8694055959166175769
+    second: dashMage_0
+  - first:
+      213: -1757972918091433600
+    second: dashMage_1
+  - first:
+      213: -3777075880146142709
+    second: dashMage_2
+  - first:
+      213: 1371077013614042391
+    second: dashMage_3
+  - first:
+      213: -7922895244658008305
+    second: dashMage_4
+  - first:
+      213: 3660083304832366811
+    second: dashMage_5
+  - first:
+      213: -8995753302111308085
+    second: dashMage_6
+  - first:
+      213: 7811050770553293820
+    second: dashMage_7
+  - first:
+      213: 3048988914537818816
+    second: dashMage_8
+  - first:
+      213: 7241460318208758706
+    second: dashMage_9
+  - first:
+      213: 444758876773885741
+    second: dashMage_10
+  - first:
+      213: 7809540853220498852
+    second: dashMage_11
+  - first:
+      213: 5673611822178251601
+    second: dashMage_12
+  - first:
+      213: 8364824652163346251
+    second: dashMage_13
+  - first:
+      213: -1883672804196843717
+    second: dashMage_14
+  - first:
+      213: -7758480077898727342
+    second: dashMage_15
+  - first:
+      213: 3130571902556693199
+    second: dashMage_16
+  - first:
+      213: 2766817745366416354
+    second: dashMage_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: dashMage_0
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 11
+        width: 47
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e538801b22885780800000000000000
+      internalID: -8694055959166175769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_1
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 11
+        width: 47
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0893764f1fc6a97e0800000000000000
+      internalID: -1757972918091433600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_2
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 11
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0a7132bf71259bc0800000000000000
+      internalID: -3777075880146142709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_3
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 12
+        width: 53
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71d1b24974b070310800000000000000
+      internalID: 1371077013614042391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_4
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 11
+        width: 54
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0f178590c83c0290800000000000000
+      internalID: -7922895244658008305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_5
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 11
+        width: 55
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd8fed0bf5a3bc230800000000000000
+      internalID: 3660083304832366811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_6
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 11
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc6bb94880aa82380800000000000000
+      internalID: -8995753302111308085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_7
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 11
+        width: 55
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfbce558a4d666c60800000000000000
+      internalID: 7811050770553293820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_8
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 11
+        width: 55
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ca6127734f205a20800000000000000
+      internalID: 3048988914537818816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_9
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 13
+        width: 55
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b39be1eac5de7460800000000000000
+      internalID: 7241460318208758706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_10
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 12
+        width: 55
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d272fcc87d91c2600800000000000000
+      internalID: 444758876773885741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_11
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 14
+        width: 53
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4addb1f7700116c60800000000000000
+      internalID: 7809540853220498852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_12
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 11
+        width: 51
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 153346664e7bcbe40800000000000000
+      internalID: 5673611822178251601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_13
+      rect:
+        serializedVersion: 2
+        x: 778
+        y: 11
+        width: 46
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4f60a0d3b3d51470800000000000000
+      internalID: 8364824652163346251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_14
+      rect:
+        serializedVersion: 2
+        x: 842
+        y: 11
+        width: 46
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3f78c09099dbd5e0800000000000000
+      internalID: -1883672804196843717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_15
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 11
+        width: 47
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 250c6efa977545490800000000000000
+      internalID: -7758480077898727342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_16
+      rect:
+        serializedVersion: 2
+        x: 969
+        y: 11
+        width: 47
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc2e5b31f86027b20800000000000000
+      internalID: 3130571902556693199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dashMage_17
+      rect:
+        serializedVersion: 2
+        x: 1033
+        y: 11
+        width: 47
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ebffc68416b56620800000000000000
+      internalID: 2766817745366416354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      dashMage_0: -8694055959166175769
+      dashMage_1: -1757972918091433600
+      dashMage_10: 444758876773885741
+      dashMage_11: 7809540853220498852
+      dashMage_12: 5673611822178251601
+      dashMage_13: 8364824652163346251
+      dashMage_14: -1883672804196843717
+      dashMage_15: -7758480077898727342
+      dashMage_16: 3130571902556693199
+      dashMage_17: 2766817745366416354
+      dashMage_2: -3777075880146142709
+      dashMage_3: 1371077013614042391
+      dashMage_4: -7922895244658008305
+      dashMage_5: 3660083304832366811
+      dashMage_6: -8995753302111308085
+      dashMage_7: 7811050770553293820
+      dashMage_8: 3048988914537818816
+      dashMage_9: 7241460318208758706
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
