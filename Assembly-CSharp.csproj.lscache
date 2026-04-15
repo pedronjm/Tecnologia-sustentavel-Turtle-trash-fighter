@@ -80,6 +80,14 @@ Assets/Nosso/codigos/sistema/
 Assets/Nosso/codigos/ui/
  EnemyHealthBar.cs
  HudColeveis.cs
+ menu/
+  MenuBindingStore.cs
+  MenuContactsController.cs
+  MenuKeybindsController.cs
+  MenuSavesController.cs
+  MenuUIController.cs
+  MenuVolumeController.cs
+  SaveSlotManager.cs
  PlayerHealthBar.cs
 Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 

@@ -24,17 +24,13 @@ public class PlayerArcher : Player
         meleeTimer -= Time.deltaTime;
         shootTimer -= Time.deltaTime;
 
-        var mouse = Mouse.current;
-        if (mouse == null)
-            return;
-
-        if (mouse.leftButton.wasPressedThisFrame && meleeTimer <= 0f)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.MeleeAttack) && meleeTimer <= 0f)
         {
             meleeTimer = meleeCooldown;
             MeleeAttack();
         }
 
-        if (mouse.rightButton.wasPressedThisFrame && shootTimer <= 0f)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.RangedAttack) && shootTimer <= 0f)
         {
             shootTimer = shootCooldown;
             ShootArrow();

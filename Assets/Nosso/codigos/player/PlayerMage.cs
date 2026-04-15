@@ -24,17 +24,13 @@ public class PlayerMage : Player
         meleeTimer -= Time.deltaTime;
         castTimer -= Time.deltaTime;
 
-        var mouse = Mouse.current;
-        if (mouse == null)
-            return;
-
-        if (mouse.leftButton.wasPressedThisFrame && meleeTimer <= 0f)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.MeleeAttack) && meleeTimer <= 0f)
         {
             meleeTimer = meleeCooldown;
             MeleeAttack();
         }
 
-        if (mouse.rightButton.wasPressedThisFrame && castTimer <= 0f)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.RangedAttack) && castTimer <= 0f)
         {
             castTimer = castCooldown;
             CastProjectile();
