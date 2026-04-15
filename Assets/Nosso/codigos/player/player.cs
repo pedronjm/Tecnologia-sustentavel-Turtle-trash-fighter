@@ -85,6 +85,29 @@ public abstract class Player : MonoBehaviour
         HandleCombatInput();
     }
 
+    protected float GetMovementAxis()
+    {
+        float horizontal = 0f;
+
+        if (MenuBindingStore.IsPressed(MenuActionId.MoveLeft))
+            horizontal -= 1f;
+
+        if (MenuBindingStore.IsPressed(MenuActionId.MoveRight))
+            horizontal += 1f;
+
+        return horizontal;
+    }
+
+    protected bool WasJumpPressedThisFrame()
+    {
+        return MenuBindingStore.WasPressedThisFrame(MenuActionId.Jump);
+    }
+
+    protected bool WasDashPressedThisFrame()
+    {
+        return MenuBindingStore.WasPressedThisFrame(MenuActionId.Dash);
+    }
+
     // Método obrigatório para as filhas
     protected abstract void HandleCombatInput();
 
@@ -127,11 +150,7 @@ public abstract class Player : MonoBehaviour
             return;
         }
 
-        float horizontal = 0f;
-        if (Keyboard.current.aKey.isPressed)
-            horizontal = -1f;
-        if (Keyboard.current.dKey.isPressed)
-            horizontal = 1f;
+        float horizontal = GetMovementAxis();
 
         // Durante wall slide não aplica velocidade horizontal (evita grudar na parede) e tira "walk" para a animação "wall" rodar
         if (isWallSliding)
@@ -158,7 +177,7 @@ public abstract class Player : MonoBehaviour
 
     void Jump()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (WasJumpPressedThisFrame())
         {
             if (isWallSliding)
             {
@@ -211,7 +230,7 @@ public abstract class Player : MonoBehaviour
         if (dashCooldown > 0)
             dashCooldown -= Time.deltaTime;
 
-        if (Keyboard.current.leftShiftKey.wasPressedThisFrame && !isDashing && dashCooldown <= 0)
+        if (WasDashPressedThisFrame() && !isDashing && dashCooldown <= 0)
         {
             StartCoroutine(PerformDash());
         }
@@ -247,11 +266,7 @@ public abstract class Player : MonoBehaviour
         );
         Collider2D wallCheck = Physics2D.OverlapCircle(wallCheckPos, wallCheckRadius, wallLayer);
 
-        float horizontal = 0f;
-        if (Keyboard.current.aKey.isPressed)
-            horizontal = -1f;
-        if (Keyboard.current.dKey.isPressed)
-            horizontal = 1f;
+        float horizontal = GetMovementAxis();
         bool pressingTowardWall = (horizontal * direction) > 0f;
         bool isTouchingWall = wallCheck != null;
         bool canSlide = isTouchingWall && pressingTowardWall && !isGrounded;

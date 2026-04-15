@@ -35,17 +35,13 @@ public class PlayerWarrior : Player
         meleeTimer -= Time.deltaTime;
         rangedTimer -= Time.deltaTime;
 
-        var mouse = Mouse.current;
-        if (mouse == null)
-            return;
-
-        if (mouse.leftButton.wasPressedThisFrame && meleeTimer <= 0f)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.MeleeAttack) && meleeTimer <= 0f)
         {
             meleeTimer = cooldown;
             StartMeleeAttack();
         }
 
-        if (mouse.rightButton.wasPressedThisFrame && rangedTimer <= 0f)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.RangedAttack) && rangedTimer <= 0f)
         {
             rangedTimer = rangedCooldown;
             RangedAttack();
