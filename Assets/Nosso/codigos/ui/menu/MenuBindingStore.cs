@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
 
 public enum MenuActionId
 {
@@ -28,12 +29,36 @@ public static class MenuBindingStore
 
     private static readonly Dictionary<MenuActionId, BindingData> bindings = new()
     {
-        [MenuActionId.MoveLeft] = new BindingData { isMouse = false, keyboardKey = Key.A },
-        [MenuActionId.MoveRight] = new BindingData { isMouse = false, keyboardKey = Key.D },
-        [MenuActionId.Jump] = new BindingData { isMouse = false, keyboardKey = Key.Space },
-        [MenuActionId.Dash] = new BindingData { isMouse = false, keyboardKey = Key.LeftShift },
-        [MenuActionId.MeleeAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Left },
-        [MenuActionId.RangedAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Right },
+        [MenuActionId.MoveLeft] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.A,
+        },
+        [MenuActionId.MoveRight] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.D,
+        },
+        [MenuActionId.Jump] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.Space,
+        },
+        [MenuActionId.Dash] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.LeftShift,
+        },
+        [MenuActionId.MeleeAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Left,
+        },
+        [MenuActionId.RangedAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Right,
+        },
     };
 
     private static bool isLoaded;
@@ -64,12 +89,36 @@ public static class MenuBindingStore
 
     public static void ResetToDefaults()
     {
-        bindings[MenuActionId.MoveLeft] = new BindingData { isMouse = false, keyboardKey = Key.A };
-        bindings[MenuActionId.MoveRight] = new BindingData { isMouse = false, keyboardKey = Key.D };
-        bindings[MenuActionId.Jump] = new BindingData { isMouse = false, keyboardKey = Key.Space };
-        bindings[MenuActionId.Dash] = new BindingData { isMouse = false, keyboardKey = Key.LeftShift };
-        bindings[MenuActionId.MeleeAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Left };
-        bindings[MenuActionId.RangedAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Right };
+        bindings[MenuActionId.MoveLeft] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.A,
+        };
+        bindings[MenuActionId.MoveRight] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.D,
+        };
+        bindings[MenuActionId.Jump] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.Space,
+        };
+        bindings[MenuActionId.Dash] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.LeftShift,
+        };
+        bindings[MenuActionId.MeleeAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Left,
+        };
+        bindings[MenuActionId.RangedAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Right,
+        };
 
         isLoaded = true;
         SaveAll();

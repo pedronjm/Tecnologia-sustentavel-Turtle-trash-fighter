@@ -12,15 +12,22 @@ public class MenuSavesController : MonoBehaviour
     [SerializeField] private Button loadButton;
     [SerializeField] private Button saveButton;
     [SerializeField] private Button deleteButton;
+    [SerializeField] private Button newGameButton;
     [SerializeField] private TMP_Text statusLabel;
+    [SerializeField] private MenuNewGameFlowController newGameFlowController;
 
     private int selectedSlotIndex = -1;
     private List<SaveSlotUI> slotUIs = new List<SaveSlotUI>();
+    private bool hasWiredButtons;
 
     private void OnEnable()
     {
         RefreshSlots();
         WireButtons();
+
+        if (newGameFlowController == null)
+            newGameFlowController = FindFirstObjectByType<MenuNewGameFlowController>();
+
         SaveSlotManager.SavesChanged += RefreshSlots;
     }
 
@@ -78,7 +85,14 @@ public class MenuSavesController : MonoBehaviour
             string slotInfo = $"{slot.slotName}\n";
 
             if (slot.hasData)
-                slotInfo += $"Progresso: {slot.completionPercent:F1}%\nSalvo em: {slot.lastSavedTime}";
+            {
+                slotInfo +=
+                    $"Personagem: {GetCharacterLabel(slot.selectedCharacter)}\n" +
+                    $"Tutorial: {GetTutorialLabel(slot.playTutorial)}\n" +
+                    $"Dificuldade: {GetDifficultyLabel(slot.difficulty)}\n" +
+                    $"Progresso: {slot.completionPercent:F1}%\n" +
+                    $"Salvo em: {slot.lastSavedTime}";
+            }
             else
                 slotInfo += "Vazio";
 
@@ -138,8 +152,22 @@ public class MenuSavesController : MonoBehaviour
         RefreshSlots();
     }
 
+    public void OnNewGameButtonClicked()
+    {
+        if (newGameFlowController == null)
+        {
+            SetStatus("Fluxo de nova partida nao encontrado.");
+            return;
+        }
+
+        newGameFlowController.BeginFlow();
+    }
+
     private void WireButtons()
     {
+        if (hasWiredButtons)
+            return;
+
         if (loadButton != null)
             loadButton.onClick.AddListener(OnLoadButtonClicked);
 
@@ -148,12 +176,44 @@ public class MenuSavesController : MonoBehaviour
 
         if (deleteButton != null)
             deleteButton.onClick.AddListener(OnDeleteButtonClicked);
+
+        if (newGameButton != null)
+            newGameButton.onClick.AddListener(OnNewGameButtonClicked);
+
+        hasWiredButtons = true;
     }
 
     private void SetStatus(string message)
     {
         if (statusLabel != null)
             statusLabel.text = message;
+    }
+
+    private static string GetCharacterLabel(PlayableCharacterId character)
+    {
+        return character switch
+        {
+            PlayableCharacterId.Warrior => "Guerreiro",
+            PlayableCharacterId.Archer => "Arqueiro",
+            PlayableCharacterId.Mage => "Mago",
+            _ => character.ToString(),
+        };
+    }
+
+    private static string GetDifficultyLabel(GameDifficulty difficulty)
+    {
+        return difficulty switch
+        {
+            GameDifficulty.Easy => "Facil",
+            GameDifficulty.Normal => "Normal",
+            GameDifficulty.Hard => "Dificil",
+            _ => difficulty.ToString(),
+        };
+    }
+
+    private static string GetTutorialLabel(bool playTutorial)
+    {
+        return playTutorial ? "Sim" : "Nao";
     }
 }
 
@@ -203,10 +263,35 @@ public class SaveSlotUI : MonoBehaviour
         string labelText = saveSlot.slotName;
 
         if (saveSlot.hasData)
-            labelText += $"\n{saveSlot.completionPercent:F1}%\n{saveSlot.lastSavedTime}";
+            labelText +=
+                $"\n{GetCharacterLabel(saveSlot.selectedCharacter)}" +
+                $"\n{GetDifficultyLabel(saveSlot.difficulty)}" +
+                $"\n{saveSlot.completionPercent:F1}%\n{saveSlot.lastSavedTime}";
         else
             labelText += "\nVazio";
 
         slotLabel.text = labelText;
+    }
+
+    private static string GetCharacterLabel(PlayableCharacterId character)
+    {
+        return character switch
+        {
+            PlayableCharacterId.Warrior => "Guerreiro",
+            PlayableCharacterId.Archer => "Arqueiro",
+            PlayableCharacterId.Mage => "Mago",
+            _ => character.ToString(),
+        };
+    }
+
+    private static string GetDifficultyLabel(GameDifficulty difficulty)
+    {
+        return difficulty switch
+        {
+            GameDifficulty.Easy => "Facil",
+            GameDifficulty.Normal => "Normal",
+            GameDifficulty.Hard => "Dificil",
+            _ => difficulty.ToString(),
+        };
     }
 }

@@ -7,6 +7,9 @@ public class SaveSlot
 {
     public int slotIndex;
     public string slotName;
+    public PlayableCharacterId selectedCharacter;
+    public bool playTutorial;
+    public GameDifficulty difficulty;
     public string checkpointId;
     public Vector3 checkpointPosition;
     public float completionPercent;
@@ -17,6 +20,9 @@ public class SaveSlot
     {
         slotIndex = index;
         slotName = $"Slot {index + 1}";
+        selectedCharacter = PlayableCharacterId.Warrior;
+        playTutorial = true;
+        difficulty = GameDifficulty.Normal;
         checkpointId = string.Empty;
         checkpointPosition = Vector3.zero;
         completionPercent = 0f;
@@ -71,6 +77,10 @@ public static class SaveSlotManager
         if (!string.IsNullOrEmpty(slotName))
             slot.slotName = slotName;
 
+        slot.selectedCharacter = NewGameSessionSettings.SelectedCharacter;
+        slot.playTutorial = NewGameSessionSettings.PlayTutorial;
+        slot.difficulty = NewGameSessionSettings.Difficulty;
+
         if (CheckpointState.instance != null)
         {
             slot.checkpointId = CheckpointState.instance.CurrentCheckpointId;
@@ -82,11 +92,11 @@ public static class SaveSlotManager
         float collectibleRatio = 0f;
         float enemyRatio = 0f;
 
-        if (ColetavelState.instance != null && ColetavelState.instance.TotalNaCena > 0)
-            collectibleRatio = (float)ColetavelState.instance.ColetadosNaCena / ColetavelState.instance.TotalNaCena;
+        if (GameControler.instance != null && GameControler.instance.TotalColetaveis > 0)
+            collectibleRatio = (float)GameControler.instance.Coletados / GameControler.instance.TotalColetaveis;
 
-        if (EnemyState.instance != null && EnemyState.instance.TotalInimigos > 0)
-            enemyRatio = (float)EnemyState.instance.InimigosDestruidos / EnemyState.instance.TotalInimigos;
+        if (EnemyState.instance != null && EnemyState.instance.TotalEnemies > 0)
+            enemyRatio = (float)EnemyState.instance.DeadEnemies / EnemyState.instance.TotalEnemies;
 
         float checkpointRatio = slot.hasData ? 1f : 0f;
         slot.completionPercent = (collectibleRatio * 0.5f + enemyRatio * 0.3f + checkpointRatio * 0.2f) * 100f;
@@ -131,6 +141,8 @@ public static class SaveSlotManager
 
         if (CheckpointState.instance != null)
             CheckpointState.instance.Restaurar(slot.checkpointId, slot.checkpointPosition);
+
+        NewGameSessionSettings.Apply(slot.selectedCharacter, slot.playTutorial, slot.difficulty);
 
         if (ColetavelState.instance != null)
             ColetavelState.instance.CarregarIds(new List<string>());

@@ -213,9 +213,10 @@ public class GameControler : MonoBehaviour
          ganhou?.SetActive(true);
          Debug.Log("Você venceu!");
      }
- 
- 
-  */public void ShowGameOver()
+
+
+    */
+        public void ShowGameOver()
     {
         Gameover?.SetActive(true);
         Debug.Log("Game Over");
@@ -224,7 +225,6 @@ public class GameControler : MonoBehaviour
 
     public void death()
     {
-        
         ShowGameOver();
         if (jogador != null)
             Destroy(jogador, 0.25f);

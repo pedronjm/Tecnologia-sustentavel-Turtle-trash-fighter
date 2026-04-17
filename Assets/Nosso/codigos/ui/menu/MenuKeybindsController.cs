@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UI;
 
 public class MenuKeybindsController : MonoBehaviour
@@ -15,9 +16,14 @@ public class MenuKeybindsController : MonoBehaviour
         public TMP_Text bindingLabel;
     }
 
-    [SerializeField] private BindingRow[] rows;
-    [SerializeField] private TMP_Text statusLabel;
-    [SerializeField] private Button resetButton;
+    [SerializeField]
+    private BindingRow[] rows;
+
+    [SerializeField]
+    private TMP_Text statusLabel;
+
+    [SerializeField]
+    private Button resetButton;
 
     private int activeRowIndex = -1;
     private bool hasWiredButtons;
@@ -80,7 +86,8 @@ public class MenuKeybindsController : MonoBehaviour
             return;
 
         activeRowIndex = rowIndex;
-        SetStatusText($"Pressione uma tecla ou clique um botão do mouse para {GetActionLabel(rows[rowIndex].action)}");
+        string actionLabel = GetActionLabel(rows[rowIndex].action);
+        SetStatusText($"Pressione uma tecla ou clique um botão do mouse para {actionLabel}");
     }
 
     private void ListenForBinding()
@@ -99,7 +106,7 @@ public class MenuKeybindsController : MonoBehaviour
 
             foreach (Key key in Enum.GetValues(typeof(Key)))
             {
-                if (key == Key.None || key == Key.AnyKey)
+                if (key == Key.None)
                     continue;
 
                 KeyControl keyControl = Keyboard.current[key];
@@ -173,7 +180,8 @@ public class MenuKeybindsController : MonoBehaviour
             if (row == null || row.bindingLabel == null)
                 continue;
 
-            row.bindingLabel.text = $"{GetActionLabel(row.action)}: {MenuBindingStore.GetDisplayName(row.action)}";
+            string bindingText = MenuBindingStore.GetDisplayName(row.action);
+            row.bindingLabel.text = $"{GetActionLabel(row.action)}: {bindingText}";
         }
     }
 

@@ -1,0 +1,559 @@
+fileFormatVersion: 2
+guid: e36ed45537e35bf4193467e07f810a04
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2516422218646476730
+    second: mageProjectile_0
+  - first:
+      213: -2272957888422596202
+    second: mageProjectile_1
+  - first:
+      213: -8491018576849915016
+    second: mageProjectile_2
+  - first:
+      213: -5417464171543043061
+    second: mageProjectile_3
+  - first:
+      213: 7619346194116617001
+    second: mageProjectile_4
+  - first:
+      213: -9218289704089554280
+    second: mageProjectile_5
+  - first:
+      213: 5152326796666772111
+    second: mageProjectile_6
+  - first:
+      213: 6510335015578470516
+    second: mageProjectile_7
+  - first:
+      213: 491601977140260807
+    second: mageProjectile_8
+  - first:
+      213: 6970441896171672530
+    second: mageProjectile_9
+  - first:
+      213: 6647023203520877501
+    second: mageProjectile_10
+  - first:
+      213: 8618015817508999949
+    second: mageProjectile_11
+  - first:
+      213: 5135247759424759047
+    second: mageProjectile_12
+  - first:
+      213: -9194536673431309094
+    second: mageProjectile_13
+  - first:
+      213: -5877227235295670336
+    second: mageProjectile_14
+  - first:
+      213: 452320877722267963
+    second: mageProjectile_15
+  - first:
+      213: 3481020669016974046
+    second: mageProjectile_16
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: mageProjectile_0
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 24
+        width: 15
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6482da0235fd31dd0800000000000000
+      internalID: -2516422218646476730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_1
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 24
+        width: 25
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6913627d7d4d470e0800000000000000
+      internalID: -2272957888422596202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_2
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 34
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8733e997797d92a80800000000000000
+      internalID: -8491018576849915016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_3
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 29
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0465c7f90d41d4b0800000000000000
+      internalID: -5417464171543043061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_4
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 24
+        width: 23
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 923ab099efa5db960800000000000000
+      internalID: 7619346194116617001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_5
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 24
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 892f91fca5e021080800000000000000
+      internalID: -9218289704089554280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_6
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 24
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8a9c026cedb08740800000000000000
+      internalID: 5152326796666772111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_7
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 24
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4788754143b595a50800000000000000
+      internalID: 6510335015578470516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_8
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 24
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7cf2352c46582d600800000000000000
+      internalID: 491601977140260807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_9
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 24
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d310dc39fbfbb060800000000000000
+      internalID: 6970441896171672530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_10
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 24
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db314abd268fe3c50800000000000000
+      internalID: 6647023203520877501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_11
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 24
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d03525fc9b7599770800000000000000
+      internalID: 8618015817508999949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_12
+      rect:
+        serializedVersion: 2
+        x: 646
+        y: 24
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 705222621a0144740800000000000000
+      internalID: 5135247759424759047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_13
+      rect:
+        serializedVersion: 2
+        x: 714
+        y: 24
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad433d93c91766080800000000000000
+      internalID: -9194536673431309094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_14
+      rect:
+        serializedVersion: 2
+        x: 774
+        y: 24
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cf43f7e7f4ef6ea0800000000000000
+      internalID: -5877227235295670336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_15
+      rect:
+        serializedVersion: 2
+        x: 842
+        y: 24
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b31f0291177f64600800000000000000
+      internalID: 452320877722267963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: mageProjectile_16
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 24
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed2ac80fad11f4030800000000000000
+      internalID: 3481020669016974046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      mageProjectile_0: -2516422218646476730
+      mageProjectile_1: -2272957888422596202
+      mageProjectile_10: 6647023203520877501
+      mageProjectile_11: 8618015817508999949
+      mageProjectile_12: 5135247759424759047
+      mageProjectile_13: -9194536673431309094
+      mageProjectile_14: -5877227235295670336
+      mageProjectile_15: 452320877722267963
+      mageProjectile_16: 3481020669016974046
+      mageProjectile_2: -8491018576849915016
+      mageProjectile_3: -5417464171543043061
+      mageProjectile_4: 7619346194116617001
+      mageProjectile_5: -9218289704089554280
+      mageProjectile_6: 5152326796666772111
+      mageProjectile_7: 6510335015578470516
+      mageProjectile_8: 491601977140260807
+      mageProjectile_9: 6970441896171672530
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

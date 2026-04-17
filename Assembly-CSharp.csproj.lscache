@@ -69,12 +69,14 @@ Assets/Nosso/codigos/player/
  PlayerArcher.cs
  PlayerMage.cs
  PlayerWarrior.cs
+ SelectedCharacterActivator.cs
 Assets/Nosso/codigos/sistema/
  CheckpointState.cs
  CheckpointTrigger.cs
  ColetavelState.cs
  EnemyState.cs
  GameControler.cs
+ NewGameSessionSettings.cs
  RemoteAuthSession.cs
  RemoteSaveService.cs
 Assets/Nosso/codigos/ui/
@@ -84,6 +86,7 @@ Assets/Nosso/codigos/ui/
   MenuBindingStore.cs
   MenuContactsController.cs
   MenuKeybindsController.cs
+  MenuNewGameFlowController.cs
   MenuSavesController.cs
   MenuUIController.cs
   MenuVolumeController.cs
@@ -360,6 +363,7 @@ Library/PackageCache/com.unity.collections@aea9d3bd5e19/
 Library/PackageCache/
  com.unity.ext.nunit@d8c07649098d/net40/unity-custom/nunit.framework.dll
  com.unity.nuget.mono-cecil@ecb9724e46ff/Mono.Cecil.dll
+ com.unity.nuget.newtonsoft-json@4dfd81071c64/Runtime/Newtonsoft.Json.dll
  com.unity.visualscripting@191c0d7e3b69/Runtime/VisualScripting.Flow/Dependencies/NCalc/Unity.VisualScripting.Antlr3.Runtime.dll
 Library/ScriptAssemblies/
  PPv2URPConverters.dll
@@ -382,6 +386,8 @@ Library/ScriptAssemblies/
  Unity.2D.Tilemap.Extras.dll
  Unity.2D.Tilemap.Extras.Editor.dll
  Unity.2D.Tooling.Editor.dll
+ Unity.Addressables.dll
+ Unity.Addressables.Editor.dll
  Unity.Burst.dll
  Unity.Burst.Editor.dll
  Unity.Cinemachine.dll
@@ -393,11 +399,14 @@ Library/ScriptAssemblies/
  Unity.InternalAPIEditorBridge.001.dll
  Unity.InternalAPIEngineBridge.001.dll
  Unity.InternalAPIEngineBridge.004.dll
+ Unity.Localization.dll
+ Unity.Localization.Editor.dll
  Unity.Mathematics.dll
  Unity.Mathematics.Editor.dll
  Unity.Multiplayer.Center.Common.dll
  Unity.Multiplayer.Center.Editor.dll
  Unity.PlasticSCM.Editor.dll
+ Unity.Profiling.Core.dll
  Unity.Rendering.LightTransport.Editor.dll
  Unity.RenderPipeline.Universal.ShaderLibrary.dll
  Unity.RenderPipelines.Core.Editor.dll
@@ -413,7 +422,10 @@ Library/ScriptAssemblies/
  Unity.RenderPipelines.Universal.Editor.dll
  Unity.RenderPipelines.Universal.Runtime.dll
  Unity.RenderPipelines.Universal.Shaders.dll
+ Unity.ResourceManager.dll
  Unity.Rider.Editor.dll
+ Unity.ScriptableBuildPipeline.dll
+ Unity.ScriptableBuildPipeline.Editor.dll
  Unity.Searcher.Editor.dll
  Unity.Settings.Editor.dll
  Unity.ShaderGraph.Editor.dll

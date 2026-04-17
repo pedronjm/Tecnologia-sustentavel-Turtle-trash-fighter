@@ -1,21 +1,19 @@
-using System.Collections.Concurrent;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using SaveApi.Data;
+using SaveApi.Models;
+using SaveApi.Repositories;
+using SaveApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 const string issuer = "TurtleTrashFighter";
 const string audience = "TurtleTrashFighterClient";
-
-// Troque em produção. Pode mover para appsettings/environment variables.
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "troque-essa-chave-super-segura-com-32-caracteres";
 
-builder
-    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -26,193 +24,221 @@ builder
             ValidateIssuerSigningKey = true,
             ValidIssuer = issuer,
             ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.FromSeconds(30),
         };
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<MySqlDb>();
+builder.Services.AddScoped<IUserRepository, MySqlUserRepository>();
+builder.Services.AddScoped<IConfigRepository, MySqlConfigRepository>();
+builder.Services.AddScoped<ISaveRepository, MySqlSaveRepository>();
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet(
-    "/",
-    () =>
-        Results.Ok(
-            new
-            {
-                service = "SaveApi",
-                status = "online",
-                endpoints = new[] { "/auth/register", "/auth/login", "/save" },
-            }
-        )
-);
+app.MapGet("/", () => Results.Ok(new
+{
+    service = "SaveApi",
+    status = "online",
+    endpoints = new[]
+    {
+        "/health",
+        "/auth/register",
+        "/auth/login",
+        "/config",
+        "/saves",
+    }
+}));
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
-var users = new ConcurrentDictionary<string, UserRecord>(StringComparer.OrdinalIgnoreCase);
-var saves = new ConcurrentDictionary<string, SavePayload>(StringComparer.OrdinalIgnoreCase);
+var authGroup = app.MapGroup("/auth");
+authGroup.MapPost("/register", RegisterAsync);
+authGroup.MapPost("/login", LoginAsync);
 
-app.MapPost(
-    "/auth/register",
-    (RegisterRequest req) =>
-    {
-        if (string.IsNullOrWhiteSpace(req.username) || string.IsNullOrWhiteSpace(req.password))
-            return Results.BadRequest(new ApiError("Usuario e senha sao obrigatorios."));
+var configGroup = app.MapGroup("/config").RequireAuthorization();
+configGroup.MapGet("", GetConfigAsync);
+configGroup.MapPut("", UpsertConfigAsync);
 
-        if (req.password.Length < 6)
-            return Results.BadRequest(new ApiError("A senha precisa ter no minimo 6 caracteres."));
-
-        if (users.ContainsKey(req.username))
-            return Results.Conflict(new ApiError("Usuario ja existe."));
-
-        var passwordData = PasswordHasher.CreateHash(req.password);
-        var user = new UserRecord(req.username, passwordData.hash, passwordData.salt);
-
-        if (!users.TryAdd(req.username, user))
-            return Results.Conflict(new ApiError("Nao foi possivel criar o usuario."));
-
-        var token = JwtTokenGenerator.Generate(req.username, jwtKey, issuer, audience);
-        return Results.Ok(new AuthResponse(token, req.username));
-    }
-);
-
-app.MapPost(
-    "/auth/login",
-    (LoginRequest req) =>
-    {
-        if (string.IsNullOrWhiteSpace(req.username) || string.IsNullOrWhiteSpace(req.password))
-            return Results.BadRequest(new ApiError("Usuario e senha sao obrigatorios."));
-
-        if (!users.TryGetValue(req.username, out var user))
-            return Results.Unauthorized();
-
-        var ok = PasswordHasher.Verify(req.password, user.PasswordHash, user.PasswordSalt);
-        if (!ok)
-            return Results.Unauthorized();
-
-        var token = JwtTokenGenerator.Generate(req.username, jwtKey, issuer, audience);
-        return Results.Ok(new AuthResponse(token, req.username));
-    }
-);
-
-app.MapGet(
-    "/save",
-    [Authorize]
-    (ClaimsPrincipal principal) =>
-    {
-        var username = principal.Identity?.Name;
-        if (string.IsNullOrWhiteSpace(username))
-            return Results.Unauthorized();
-
-        if (saves.TryGetValue(username, out var save))
-            return Results.Ok(save);
-
-        return Results.NotFound(new ApiError("Nenhum save encontrado para este usuario."));
-    }
-);
-
-app.MapPut(
-    "/save",
-    [Authorize]
-    (ClaimsPrincipal principal, SavePayload payload) =>
-    {
-        var username = principal.Identity?.Name;
-        if (string.IsNullOrWhiteSpace(username))
-            return Results.Unauthorized();
-
-        payload.username = username;
-        payload.lastUpdatedUtc = DateTime.UtcNow;
-
-        saves[username] = payload;
-        return Results.Ok(payload);
-    }
-);
+var saveGroup = app.MapGroup("/saves").RequireAuthorization();
+saveGroup.MapGet("", GetAllSavesAsync);
+saveGroup.MapGet("/{slotIndex:int}", GetSaveAsync);
+saveGroup.MapPut("", UpsertSaveAsync);
+saveGroup.MapDelete("/{slotIndex:int}", DeleteSaveAsync);
 
 app.Run();
 
-record RegisterRequest(string username, string password);
-
-record LoginRequest(string username, string password);
-
-record AuthResponse(string accessToken, string username);
-
-record ApiError(string message);
-
-record UserRecord(string Username, string PasswordHash, string PasswordSalt);
-
-public class SavePayload
+async Task<IResult> RegisterAsync(
+    RegisterRequest request,
+    IUserRepository users,
+    CancellationToken cancellationToken)
 {
-    public string username { get; set; } = string.Empty;
-    public string sceneName { get; set; } = string.Empty;
-    public List<string> collectedIds { get; set; } = new();
-    public List<string> deadEnemyIds { get; set; } = new();
-    public string checkpointId { get; set; } = string.Empty;
-    public PositionData checkpointPosition { get; set; } = new();
-    public float completionPercent { get; set; }
-    public DateTime lastUpdatedUtc { get; set; } = DateTime.UtcNow;
+    if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
+        return Results.BadRequest(new ApiError("Login e senha sao obrigatorios."));
+
+    if (string.IsNullOrWhiteSpace(request.Nome))
+        return Results.BadRequest(new ApiError("Nome e obrigatorio."));
+
+    if (request.Password.Length < 6)
+        return Results.BadRequest(new ApiError("A senha precisa ter no minimo 6 caracteres."));
+
+    var existing = await users.GetByLoginAsync(request.Login, cancellationToken);
+    if (existing != null)
+        return Results.Conflict(new ApiError("Usuario ja existe."));
+
+    var (hash, salt) = PasswordHasher.CreateHash(request.Password);
+    var created = await users.CreateAsync(request.Login, hash, salt, request.Nome, cancellationToken);
+    var token = JwtTokenGenerator.Generate(created.Login, created.Nome, jwtKey, issuer, audience);
+
+    return Results.Ok(new AuthResponse(token, created.Login, created.Nome));
 }
 
-public class PositionData
+async Task<IResult> LoginAsync(
+    LoginRequest request,
+    IUserRepository users,
+    CancellationToken cancellationToken)
 {
-    public float x { get; set; }
-    public float y { get; set; }
-    public float z { get; set; }
+    if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
+        return Results.BadRequest(new ApiError("Login e senha sao obrigatorios."));
+
+    var user = await users.GetByLoginAsync(request.Login, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
+
+    if (!PasswordHasher.Verify(request.Password, user.PasswordHash, user.PasswordSalt))
+        return Results.Unauthorized();
+
+    var token = JwtTokenGenerator.Generate(user.Login, user.Nome, jwtKey, issuer, audience);
+    return Results.Ok(new AuthResponse(token, user.Login, user.Nome));
 }
 
-static class PasswordHasher
+async Task<IResult> GetConfigAsync(
+    ClaimsPrincipal principal,
+    IUserRepository users,
+    IConfigRepository configs,
+    CancellationToken cancellationToken)
 {
-    public static (string hash, string salt) CreateHash(string password)
-    {
-        var saltBytes = RandomNumberGenerator.GetBytes(16);
-        var hashBytes = Rfc2898DeriveBytes.Pbkdf2(
-            password,
-            saltBytes,
-            100_000,
-            HashAlgorithmName.SHA256,
-            32
-        );
-        return (Convert.ToBase64String(hashBytes), Convert.ToBase64String(saltBytes));
-    }
+    var user = await GetCurrentUserAsync(principal, users, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
 
-    public static bool Verify(string password, string hash, string salt)
+    var config = await configs.GetAsync(user.Id, cancellationToken);
+    if (config == null)
+        return Results.Ok(new UserConfigResponse
+        {
+            VolumeMaster = 1f,
+            VolumeMusic = 1f,
+            VolumeSfx = 1f,
+            Keybinds = System.Text.Json.JsonDocument.Parse("{}").RootElement.Clone(),
+        });
+
+    return Results.Ok(new UserConfigResponse
     {
-        var saltBytes = Convert.FromBase64String(salt);
-        var hashBytes = Rfc2898DeriveBytes.Pbkdf2(
-            password,
-            saltBytes,
-            100_000,
-            HashAlgorithmName.SHA256,
-            32
-        );
-        var provided = Convert.ToBase64String(hashBytes);
-        return CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(provided),
-            Encoding.UTF8.GetBytes(hash)
-        );
-    }
+        VolumeMaster = config.VolumeMaster,
+        VolumeMusic = config.VolumeMusic,
+        VolumeSfx = config.VolumeSfx,
+        Keybinds = ParseJsonElement(config.KeybindsJson),
+    });
 }
 
-static class JwtTokenGenerator
+async Task<IResult> UpsertConfigAsync(
+    ClaimsPrincipal principal,
+    UserConfigUpsertRequest request,
+    IUserRepository users,
+    IConfigRepository configs,
+    CancellationToken cancellationToken)
 {
-    public static string Generate(string username, string key, string issuer, string audience)
+    var user = await GetCurrentUserAsync(principal, users, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
+
+    var saved = await configs.UpsertAsync(user.Id, request, cancellationToken);
+    return Results.Ok(new UserConfigResponse
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-        var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        VolumeMaster = saved.VolumeMaster,
+        VolumeMusic = saved.VolumeMusic,
+        VolumeSfx = saved.VolumeSfx,
+        Keybinds = ParseJsonElement(saved.KeybindsJson),
+    });
+}
 
-        var claims = new[] { new Claim(ClaimTypes.Name, username) };
+async Task<IResult> GetAllSavesAsync(
+    ClaimsPrincipal principal,
+    IUserRepository users,
+    ISaveRepository saves,
+    CancellationToken cancellationToken)
+{
+    var user = await GetCurrentUserAsync(principal, users, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
 
-        var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
-            signingCredentials: creds
-        );
+    var items = await saves.GetAllAsync(user.Id, cancellationToken);
+    return Results.Ok(items);
+}
 
-        return new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token);
-    }
+async Task<IResult> GetSaveAsync(
+    ClaimsPrincipal principal,
+    int slotIndex,
+    IUserRepository users,
+    ISaveRepository saves,
+    CancellationToken cancellationToken)
+{
+    var user = await GetCurrentUserAsync(principal, users, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
+
+    var save = await saves.GetAsync(user.Id, slotIndex, cancellationToken);
+    return save == null ? Results.NotFound(new ApiError("Save nao encontrado.")) : Results.Ok(save);
+}
+
+async Task<IResult> UpsertSaveAsync(
+    ClaimsPrincipal principal,
+    SaveUpsertRequest request,
+    IUserRepository users,
+    ISaveRepository saves,
+    CancellationToken cancellationToken)
+{
+    var user = await GetCurrentUserAsync(principal, users, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
+
+    var saved = await saves.UpsertAsync(user.Id, request, cancellationToken);
+    return Results.Ok(saved);
+}
+
+async Task<IResult> DeleteSaveAsync(
+    ClaimsPrincipal principal,
+    int slotIndex,
+    IUserRepository users,
+    ISaveRepository saves,
+    CancellationToken cancellationToken)
+{
+    var user = await GetCurrentUserAsync(principal, users, cancellationToken);
+    if (user == null)
+        return Results.Unauthorized();
+
+    var deleted = await saves.DeleteAsync(user.Id, slotIndex, cancellationToken);
+    return deleted ? Results.NoContent() : Results.NotFound(new ApiError("Save nao encontrado."));
+}
+
+static async Task<UserAccount?> GetCurrentUserAsync(
+    ClaimsPrincipal principal,
+    IUserRepository users,
+    CancellationToken cancellationToken)
+{
+    var login = principal.Identity?.Name;
+    if (string.IsNullOrWhiteSpace(login))
+        return null;
+
+    return await users.GetByLoginAsync(login, cancellationToken);
+}
+
+static System.Text.Json.JsonElement ParseJsonElement(string json)
+{
+    using var document = System.Text.Json.JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+    return document.RootElement.Clone();
 }

@@ -142,6 +142,9 @@ public class RemoteSaveService : MonoBehaviour
     {
         var payload = new SavePayload();
         payload.sceneName = SceneManager.GetActiveScene().name;
+        payload.selectedCharacter = NewGameSessionSettings.SelectedCharacter.ToString();
+        payload.playTutorial = NewGameSessionSettings.PlayTutorial;
+        payload.difficulty = NewGameSessionSettings.Difficulty.ToString();
 
         if (ColetavelState.instance != null)
             payload.collectedIds = ColetavelState.instance.GetCollectedIds().ToList();
@@ -187,6 +190,13 @@ public class RemoteSaveService : MonoBehaviour
     void ApplySavePayload(SavePayload payload)
     {
         EnsureStateObjects();
+
+        if (!string.IsNullOrWhiteSpace(payload.selectedCharacter) &&
+            Enum.TryParse(payload.selectedCharacter, true, out PlayableCharacterId characterId) &&
+            Enum.TryParse(payload.difficulty, true, out GameDifficulty difficulty))
+        {
+            NewGameSessionSettings.Apply(characterId, payload.playTutorial, difficulty);
+        }
 
         if (ColetavelState.instance != null)
             ColetavelState.instance.CarregarIds(payload.collectedIds);
@@ -289,6 +299,9 @@ public class RemoteSaveService : MonoBehaviour
     class SavePayload
     {
         public string sceneName;
+        public string selectedCharacter;
+        public bool playTutorial;
+        public string difficulty;
         public List<string> collectedIds = new List<string>();
         public List<string> deadEnemyIds = new List<string>();
         public string checkpointId;

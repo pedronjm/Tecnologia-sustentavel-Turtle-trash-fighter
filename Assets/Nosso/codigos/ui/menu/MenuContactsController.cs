@@ -4,10 +4,17 @@ using UnityEngine.UI;
 
 public class MenuContactsController : MonoBehaviour
 {
-    [SerializeField] private string contactEmail = "seuemail@exemplo.com";
-    [SerializeField] private TMP_Text emailLabel;
-    [SerializeField] private TMP_Text feedbackLabel;
-    [SerializeField] private Button copyButton;
+    [SerializeField]
+    private string contactEmail = "seuemail@exemplo.com";
+
+    [SerializeField]
+    private TMP_Text emailLabel;
+
+    [SerializeField]
+    private TMP_Text feedbackLabel;
+
+    [SerializeField]
+    private Button copyButton;
 
     private void Awake()
     {
