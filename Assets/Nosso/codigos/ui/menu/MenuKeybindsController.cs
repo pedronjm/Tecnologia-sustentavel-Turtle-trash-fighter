@@ -99,7 +99,7 @@ public class MenuKeybindsController : MonoBehaviour
 
             foreach (Key key in Enum.GetValues(typeof(Key)))
             {
-                if (key == Key.None || key == Key.AnyKey)
+                if (key == Key.None || Keyboard.current.anyKey.wasPressedThisFrame == false)
                     continue;
 
                 KeyControl keyControl = Keyboard.current[key];

@@ -85,8 +85,8 @@ public static class SaveSlotManager
         if (ColetavelState.instance != null && ColetavelState.instance.TotalNaCena > 0)
             collectibleRatio = (float)ColetavelState.instance.ColetadosNaCena / ColetavelState.instance.TotalNaCena;
 
-        if (EnemyState.instance != null && EnemyState.instance.TotalInimigos > 0)
-            enemyRatio = (float)EnemyState.instance.InimigosDestruidos / EnemyState.instance.TotalInimigos;
+        if (EnemyState.instance != null && EnemyState.instance.TotalEnemies > 0)
+            enemyRatio = (float)EnemyState.instance.DeadEnemies / EnemyState.instance.TotalEnemies;
 
         float checkpointRatio = slot.hasData ? 1f : 0f;
         slot.completionPercent = (collectibleRatio * 0.5f + enemyRatio * 0.3f + checkpointRatio * 0.2f) * 100f;
