@@ -15,6 +15,16 @@ public enum MenuActionId
     RangedAttack,
 }
 
+public enum MouseButton
+{
+    Forward = 0,
+    Back = 1,
+    Left = 2,
+    Right = 3,
+    Middle = 4,
+    
+}
+
 public static class MenuBindingStore
 {
     [Serializable]

@@ -10,6 +10,9 @@ public class ColetavelState : MonoBehaviour
 {
     public static ColetavelState instance { get; private set; }
 
+    public int TotalNaCena;      // Quantidade total de itens que existem na fase
+    public int ColetadosNaCena => collectedIds.Count; // Retorna quantos IDs estão na lista
+
     private HashSet<string> collectedIds = new HashSet<string>();
 
     void Awake()
