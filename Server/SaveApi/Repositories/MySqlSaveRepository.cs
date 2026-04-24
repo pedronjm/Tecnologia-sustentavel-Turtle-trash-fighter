@@ -14,9 +14,13 @@ public sealed class MySqlSaveRepository : ISaveRepository
         _db = db;
     }
 
-    public async Task<IReadOnlyList<SaveSlotRecord>> GetAllAsync(long userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<SaveSlotRecord>> GetAllAsync(
+        long userId,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 SELECT id, user_id, slot_index, slot_name, selected_character, play_tutorial, difficulty, scene_name,
        checkpoint_id, checkpoint_x, checkpoint_y, checkpoint_z, collected_ids_json, dead_enemy_ids_json,
        completion_percent, last_saved_at_utc
@@ -38,9 +42,14 @@ ORDER BY slot_index;";
         return results;
     }
 
-    public async Task<SaveSlotRecord?> GetAsync(long userId, int slotIndex, CancellationToken cancellationToken = default)
+    public async Task<SaveSlotRecord?> GetAsync(
+        long userId,
+        int slotIndex,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 SELECT id, user_id, slot_index, slot_name, selected_character, play_tutorial, difficulty, scene_name,
        checkpoint_id, checkpoint_x, checkpoint_y, checkpoint_z, collected_ids_json, dead_enemy_ids_json,
        completion_percent, last_saved_at_utc
@@ -61,9 +70,14 @@ LIMIT 1;";
         return MapSave(reader);
     }
 
-    public async Task<SaveSlotRecord> UpsertAsync(long userId, SaveUpsertRequest request, CancellationToken cancellationToken = default)
+    public async Task<SaveSlotRecord> UpsertAsync(
+        long userId,
+        SaveUpsertRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 INSERT INTO saves (
     user_id, slot_index, slot_name, selected_character, play_tutorial, difficulty, scene_name,
     checkpoint_id, checkpoint_x, checkpoint_y, checkpoint_z, collected_ids_json, dead_enemy_ids_json,
@@ -118,9 +132,14 @@ LIMIT 1;";
         return (await GetAsync(userId, request.SlotIndex, cancellationToken))!;
     }
 
-    public async Task<bool> DeleteAsync(long userId, int slotIndex, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAsync(
+        long userId,
+        int slotIndex,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 DELETE FROM saves
 WHERE user_id = @user_id AND slot_index = @slot_index;";
 

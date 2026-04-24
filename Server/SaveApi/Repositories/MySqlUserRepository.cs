@@ -14,9 +14,13 @@ public sealed class MySqlUserRepository : IUserRepository
         _db = db;
     }
 
-    public async Task<UserAccount?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
+    public async Task<UserAccount?> GetByLoginAsync(
+        string login,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 SELECT id, login, password_hash, password_salt, nome, created_at_utc
 FROM users
 WHERE login = @login
@@ -34,9 +38,13 @@ LIMIT 1;";
         return MapUser(reader);
     }
 
-    public async Task<UserAccount?> GetByIdAsync(long userId, CancellationToken cancellationToken = default)
+    public async Task<UserAccount?> GetByIdAsync(
+        long userId,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 SELECT id, login, password_hash, password_salt, nome, created_at_utc
 FROM users
 WHERE id = @id
@@ -54,9 +62,16 @@ LIMIT 1;";
         return MapUser(reader);
     }
 
-    public async Task<UserAccount> CreateAsync(string login, string passwordHash, string passwordSalt, string nome, CancellationToken cancellationToken = default)
+    public async Task<UserAccount> CreateAsync(
+        string login,
+        string passwordHash,
+        string passwordSalt,
+        string nome,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 INSERT INTO users (login, password_hash, password_salt, nome)
 VALUES (@login, @password_hash, @password_salt, @nome);
 

@@ -1,0 +1,80 @@
+@baseUrl = http://localhost:5000
+@token = COLE_SEU_ACCESS_TOKEN_AQUI
+
+### Health
+GET {{baseUrl}}/health
+
+### Database info
+GET {{baseUrl}}/health/database
+
+### Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "Login": "teste",
+  "Password": "123456",
+  "Nome": "Usuario Teste"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "Login": "teste",
+  "Password": "123456"
+}
+
+### Get config
+GET {{baseUrl}}/config
+Authorization: Bearer {{token}}
+
+### Update config
+PUT {{baseUrl}}/config
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "VolumeMaster": 1,
+  "VolumeMusic": 0.8,
+  "VolumeSfx": 0.7,
+  "Keybinds": {
+    "moveLeft": "A",
+    "moveRight": "D",
+    "jump": "Space"
+  }
+}
+
+### Get saves
+GET {{baseUrl}}/saves
+Authorization: Bearer {{token}}
+
+### Update save slot 1
+PUT {{baseUrl}}/saves
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "SlotIndex": 1,
+  "SlotName": "Slot 1",
+  "SelectedCharacter": "Turtle",
+  "PlayTutorial": true,
+  "Difficulty": "Normal",
+  "SceneName": "Level1",
+  "CheckpointId": "cp-001",
+  "CheckpointX": 10,
+  "CheckpointY": 5,
+  "CheckpointZ": 0,
+  "CollectedIds": ["coin-1", "coin-2"],
+  "DeadEnemyIds": [],
+  "CompletionPercent": 12.5
+}
+
+### Get save slot 1
+GET {{baseUrl}}/saves/1
+Authorization: Bearer {{token}}
+
+### Delete save slot 1
+DELETE {{baseUrl}}/saves/1
+Authorization: Bearer {{token}}

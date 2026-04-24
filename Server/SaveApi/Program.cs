@@ -13,7 +13,8 @@ const string issuer = "TurtleTrashFighter";
 const string audience = "TurtleTrashFighterClient";
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "troque-essa-chave-super-segura-com-32-caracteres";
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -40,21 +41,30 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => Results.Ok(new
-{
-    service = "SaveApi",
-    status = "online",
-    endpoints = new[]
-    {
-        "/health",
-        "/auth/register",
-        "/auth/login",
-        "/config",
-        "/saves",
-    }
-}));
+app.MapGet(
+    "/",
+    () =>
+        Results.Ok(
+            new
+            {
+                service = "SaveApi",
+                status = "online",
+                endpoints = new[]
+                {
+                    "/health",
+                    "/health/database",
+                    "/auth/register",
+                    "/auth/login",
+                    "/config",
+                    "/saves",
+                },
+            }
+        )
+);
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+
+app.MapGet("/health/database", (MySqlDb db) => Results.Ok(db.GetConnectionInfo()));
 
 var authGroup = app.MapGroup("/auth");
 authGroup.MapPost("/register", RegisterAsync);
@@ -75,7 +85,8 @@ app.Run();
 async Task<IResult> RegisterAsync(
     RegisterRequest request,
     IUserRepository users,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
         return Results.BadRequest(new ApiError("Login e senha sao obrigatorios."));
@@ -91,7 +102,13 @@ async Task<IResult> RegisterAsync(
         return Results.Conflict(new ApiError("Usuario ja existe."));
 
     var (hash, salt) = PasswordHasher.CreateHash(request.Password);
-    var created = await users.CreateAsync(request.Login, hash, salt, request.Nome, cancellationToken);
+    var created = await users.CreateAsync(
+        request.Login,
+        hash,
+        salt,
+        request.Nome,
+        cancellationToken
+    );
     var token = JwtTokenGenerator.Generate(created.Login, created.Nome, jwtKey, issuer, audience);
 
     return Results.Ok(new AuthResponse(token, created.Login, created.Nome));
@@ -100,7 +117,8 @@ async Task<IResult> RegisterAsync(
 async Task<IResult> LoginAsync(
     LoginRequest request,
     IUserRepository users,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
         return Results.BadRequest(new ApiError("Login e senha sao obrigatorios."));
@@ -120,7 +138,8 @@ async Task<IResult> GetConfigAsync(
     ClaimsPrincipal principal,
     IUserRepository users,
     IConfigRepository configs,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var user = await GetCurrentUserAsync(principal, users, cancellationToken);
     if (user == null)
@@ -128,21 +147,25 @@ async Task<IResult> GetConfigAsync(
 
     var config = await configs.GetAsync(user.Id, cancellationToken);
     if (config == null)
-        return Results.Ok(new UserConfigResponse
-        {
-            VolumeMaster = 1f,
-            VolumeMusic = 1f,
-            VolumeSfx = 1f,
-            Keybinds = System.Text.Json.JsonDocument.Parse("{}").RootElement.Clone(),
-        });
+        return Results.Ok(
+            new UserConfigResponse
+            {
+                VolumeMaster = 1f,
+                VolumeMusic = 1f,
+                VolumeSfx = 1f,
+                Keybinds = System.Text.Json.JsonDocument.Parse("{}").RootElement.Clone(),
+            }
+        );
 
-    return Results.Ok(new UserConfigResponse
-    {
-        VolumeMaster = config.VolumeMaster,
-        VolumeMusic = config.VolumeMusic,
-        VolumeSfx = config.VolumeSfx,
-        Keybinds = ParseJsonElement(config.KeybindsJson),
-    });
+    return Results.Ok(
+        new UserConfigResponse
+        {
+            VolumeMaster = config.VolumeMaster,
+            VolumeMusic = config.VolumeMusic,
+            VolumeSfx = config.VolumeSfx,
+            Keybinds = ParseJsonElement(config.KeybindsJson),
+        }
+    );
 }
 
 async Task<IResult> UpsertConfigAsync(
@@ -150,27 +173,31 @@ async Task<IResult> UpsertConfigAsync(
     UserConfigUpsertRequest request,
     IUserRepository users,
     IConfigRepository configs,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var user = await GetCurrentUserAsync(principal, users, cancellationToken);
     if (user == null)
         return Results.Unauthorized();
 
     var saved = await configs.UpsertAsync(user.Id, request, cancellationToken);
-    return Results.Ok(new UserConfigResponse
-    {
-        VolumeMaster = saved.VolumeMaster,
-        VolumeMusic = saved.VolumeMusic,
-        VolumeSfx = saved.VolumeSfx,
-        Keybinds = ParseJsonElement(saved.KeybindsJson),
-    });
+    return Results.Ok(
+        new UserConfigResponse
+        {
+            VolumeMaster = saved.VolumeMaster,
+            VolumeMusic = saved.VolumeMusic,
+            VolumeSfx = saved.VolumeSfx,
+            Keybinds = ParseJsonElement(saved.KeybindsJson),
+        }
+    );
 }
 
 async Task<IResult> GetAllSavesAsync(
     ClaimsPrincipal principal,
     IUserRepository users,
     ISaveRepository saves,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var user = await GetCurrentUserAsync(principal, users, cancellationToken);
     if (user == null)
@@ -185,7 +212,8 @@ async Task<IResult> GetSaveAsync(
     int slotIndex,
     IUserRepository users,
     ISaveRepository saves,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var user = await GetCurrentUserAsync(principal, users, cancellationToken);
     if (user == null)
@@ -200,7 +228,8 @@ async Task<IResult> UpsertSaveAsync(
     SaveUpsertRequest request,
     IUserRepository users,
     ISaveRepository saves,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var user = await GetCurrentUserAsync(principal, users, cancellationToken);
     if (user == null)
@@ -215,7 +244,8 @@ async Task<IResult> DeleteSaveAsync(
     int slotIndex,
     IUserRepository users,
     ISaveRepository saves,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var user = await GetCurrentUserAsync(principal, users, cancellationToken);
     if (user == null)
@@ -228,7 +258,8 @@ async Task<IResult> DeleteSaveAsync(
 static async Task<UserAccount?> GetCurrentUserAsync(
     ClaimsPrincipal principal,
     IUserRepository users,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken
+)
 {
     var login = principal.Identity?.Name;
     if (string.IsNullOrWhiteSpace(login))
@@ -239,6 +270,8 @@ static async Task<UserAccount?> GetCurrentUserAsync(
 
 static System.Text.Json.JsonElement ParseJsonElement(string json)
 {
-    using var document = System.Text.Json.JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+    using var document = System.Text.Json.JsonDocument.Parse(
+        string.IsNullOrWhiteSpace(json) ? "{}" : json
+    );
     return document.RootElement.Clone();
 }

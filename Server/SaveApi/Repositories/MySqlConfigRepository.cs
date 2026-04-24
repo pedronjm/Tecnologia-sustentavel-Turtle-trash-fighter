@@ -14,9 +14,13 @@ public sealed class MySqlConfigRepository : IConfigRepository
         _db = db;
     }
 
-    public async Task<UserConfig?> GetAsync(long userId, CancellationToken cancellationToken = default)
+    public async Task<UserConfig?> GetAsync(
+        long userId,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 SELECT id, user_id, volume_master, volume_music, volume_sfx, keybinds_json, updated_at_utc
 FROM user_configs
 WHERE user_id = @user_id
@@ -43,9 +47,14 @@ LIMIT 1;";
         };
     }
 
-    public async Task<UserConfig> UpsertAsync(long userId, UserConfigUpsertRequest request, CancellationToken cancellationToken = default)
+    public async Task<UserConfig> UpsertAsync(
+        long userId,
+        UserConfigUpsertRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        const string sql = @"
+        const string sql =
+            @"
 INSERT INTO user_configs (user_id, volume_master, volume_music, volume_sfx, keybinds_json, updated_at_utc)
 VALUES (@user_id, @volume_master, @volume_music, @volume_sfx, @keybinds_json, UTC_TIMESTAMP())
 ON DUPLICATE KEY UPDATE

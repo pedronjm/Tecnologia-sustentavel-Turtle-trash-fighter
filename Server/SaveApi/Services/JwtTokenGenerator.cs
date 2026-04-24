@@ -6,7 +6,13 @@ namespace SaveApi.Services;
 
 public static class JwtTokenGenerator
 {
-    public static string Generate(string login, string nome, string key, string issuer, string audience)
+    public static string Generate(
+        string login,
+        string nome,
+        string key,
+        string issuer,
+        string audience
+    )
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

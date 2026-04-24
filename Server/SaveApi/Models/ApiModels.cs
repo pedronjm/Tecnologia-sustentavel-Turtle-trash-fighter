@@ -3,8 +3,11 @@ using System.Text.Json;
 namespace SaveApi.Models;
 
 public sealed record RegisterRequest(string Login, string Password, string Nome);
+
 public sealed record LoginRequest(string Login, string Password);
+
 public sealed record AuthResponse(string AccessToken, string Login, string Nome);
+
 public sealed record ApiError(string Message);
 
 public sealed record UserAccount
