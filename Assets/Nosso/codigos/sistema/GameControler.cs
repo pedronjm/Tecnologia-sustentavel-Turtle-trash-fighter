@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class GameControler : MonoBehaviour
 {
     // // Textos na tela
@@ -42,14 +43,14 @@ public class GameControler : MonoBehaviour
     // [HideInInspector] public float rstmaca;
     // [HideInInspector] public float rstcircuito;
 
-    // Áudios desativados por enquanto (quando for usar, descomente e atribua no Inspector)
-    // public AudioSource audioSource;
-    // public AudioClip coletar;
-    // public AudioClip jogarfora;
-    // public AudioClip stepcomplete;
-    // public AudioClip tutorialcomplete;
-    // public AudioClip fasecomplete;
-    // public AudioClip heal;
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip collectClip;
+    public AudioClip playerAttackClip;
+    public AudioClip playerHitClip;
+    public AudioClip playerDeathClip;
+    public AudioClip enemyHitClip;
+    public AudioClip enemyDeathClip;
 
     // Variáveis auxiliares
     // public float fase;
@@ -72,6 +73,7 @@ public class GameControler : MonoBehaviour
     // Contagem de coletáveis na cena (total e quantos restam)
     private int totalColetaveis;
     private int coletados;
+    private bool gameOverTriggered;
 
     /// <summary>Total de coletáveis que existiam na cena ao iniciar.</summary>
     public int TotalColetaveis => totalColetaveis;
@@ -100,6 +102,16 @@ public class GameControler : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.spatialBlend = 0f;
     }
 
     void Start()
@@ -111,9 +123,9 @@ public class GameControler : MonoBehaviour
 
     void Update()
     {
-        if (Player.player != null && Player.player.GetComponent<Damageable>().currentHealth <= 0)
+        Damageable playerDamageable = Player.player != null ? Player.player.GetComponent<Damageable>() : null;
+        if (playerDamageable != null && playerDamageable.currentHealth <= 0)
         {
-            Debug.Log("Vida do jogador chegou a zero!");
             death();
         }
     }
@@ -134,6 +146,42 @@ public class GameControler : MonoBehaviour
     {
         coletados++;
         AtualizarTextoRestantes();
+    }
+
+    public void PlayCollectSound()
+    {
+        PlayClip(collectClip);
+    }
+
+    public void PlayPlayerAttackSound()
+    {
+        PlayClip(playerAttackClip);
+    }
+
+    public void PlayPlayerHitSound()
+    {
+        PlayClip(playerHitClip);
+    }
+
+    public void PlayPlayerDeathSound()
+    {
+        PlayClip(playerDeathClip);
+    }
+
+    public void PlayEnemyHitSound()
+    {
+        PlayClip(enemyHitClip);
+    }
+
+    public void PlayEnemyDeathSound()
+    {
+        PlayClip(enemyDeathClip);
+    }
+
+    void PlayClip(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+            audioSource.PlayOneShot(clip);
     }
 
     void AtualizarTextoRestantes()
@@ -218,16 +266,21 @@ public class GameControler : MonoBehaviour
     */
         public void ShowGameOver()
     {
-        Gameover?.SetActive(true);
-        Debug.Log("Game Over");
+            if (Gameover != null)
+                Gameover.SetActive(true);
     }
 
 
     public void death()
     {
+            if (gameOverTriggered)
+                return;
+
+            gameOverTriggered = true;
+            PlayPlayerDeathSound();
         ShowGameOver();
-        if (jogador != null)
-            Destroy(jogador, 0.25f);
+            if (jogador != null)
+                Destroy(jogador, 0.25f);
     }
     /*
        

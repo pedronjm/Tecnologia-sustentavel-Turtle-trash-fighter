@@ -39,6 +39,9 @@ public class PlayerArcher : Player
 
     private void MeleeAttack()
     {
+        if (GameControler.instance != null)
+            GameControler.instance.PlayPlayerAttackSound();
+
         anim.SetTrigger("attack");
 
         if (attackPoint == null)
@@ -60,6 +63,9 @@ public class PlayerArcher : Player
     {
         if (arrowPrefab == null || arrowSpawnPoint == null)
             return;
+
+        if (GameControler.instance != null)
+            GameControler.instance.PlayPlayerAttackSound();
 
         GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.identity);
 

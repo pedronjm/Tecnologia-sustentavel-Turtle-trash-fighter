@@ -30,6 +30,9 @@ public class Damageable : MonoBehaviour
         if (currentHealth <= 0)
             return;
 
+        bool isEnemy = GetComponent<enemy>() != null;
+        bool isPlayer = GetComponent<Player>() != null;
+
         currentHealth -= damage;
         if (currentHealth < 0)
             currentHealth = 0;
@@ -39,6 +42,16 @@ public class Damageable : MonoBehaviour
 
         if (currentHealth == 0)
         {
+            if (isPlayer)
+            {
+                if (GameControler.instance != null)
+                    GameControler.instance.death();
+            }
+            else if (isEnemy && GameControler.instance != null)
+            {
+                GameControler.instance.PlayEnemyDeathSound();
+            }
+
             if (inimigoScript != null)
                 inimigoScript.Die();
 
@@ -46,6 +59,16 @@ public class Damageable : MonoBehaviour
         }
         else
         {
+            if (isPlayer)
+            {
+                if (GameControler.instance != null)
+                    GameControler.instance.PlayPlayerHitSound();
+            }
+            else if (isEnemy && GameControler.instance != null)
+            {
+                GameControler.instance.PlayEnemyHitSound();
+            }
+
             if (inimigoScript != null)
                 inimigoScript.ApplyKnockback(attackPosition);
         }

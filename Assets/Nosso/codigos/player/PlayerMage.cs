@@ -39,6 +39,9 @@ public class PlayerMage : Player
 
     private void MeleeAttack()
     {
+        if (GameControler.instance != null)
+            GameControler.instance.PlayPlayerAttackSound();
+
         anim.SetTrigger("attack");
 
         if (attackPoint == null)
@@ -60,6 +63,9 @@ public class PlayerMage : Player
     {
         if (projectilePrefab == null || projectileSpawnPoint == null)
             return;
+
+        if (GameControler.instance != null)
+            GameControler.instance.PlayPlayerAttackSound();
 
         GameObject proj = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.identity);
 

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   password_salt VARCHAR(255) NOT NULL,
   nome VARCHAR(120) NOT NULL,
-  created_at_utc DATETIME NOT NULL DEFAULT UTC_TIMESTAMP(),
+  created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_login (login)
 );
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS user_configs (
   volume_music FLOAT NOT NULL DEFAULT 1,
   volume_sfx FLOAT NOT NULL DEFAULT 1,
   keybinds_json JSON NOT NULL,
-  updated_at_utc DATETIME NOT NULL DEFAULT UTC_TIMESTAMP(),
+  updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_user_configs_user (user_id),
   CONSTRAINT fk_user_configs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS saves (
   collected_ids_json JSON NOT NULL,
   dead_enemy_ids_json JSON NOT NULL,
   completion_percent FLOAT NOT NULL DEFAULT 0,
-  last_saved_at_utc DATETIME NOT NULL DEFAULT UTC_TIMESTAMP(),
+  last_saved_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_saves_user_slot (user_id, slot_index),
   CONSTRAINT fk_saves_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

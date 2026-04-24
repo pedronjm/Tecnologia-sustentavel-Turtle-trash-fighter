@@ -50,6 +50,9 @@ public class PlayerWarrior : Player
 
     private void StartMeleeAttack()
     {
+        if (GameControler.instance != null)
+            GameControler.instance.PlayPlayerAttackSound();
+
         anim.SetTrigger("Close range");
 
         if (meleeHitCoroutine != null)
@@ -91,6 +94,9 @@ public class PlayerWarrior : Player
     {
         if (projectilePrefab == null || projectileSpawnPoint == null)
             return;
+
+        if (GameControler.instance != null)
+            GameControler.instance.PlayPlayerAttackSound();
 
         anim.SetTrigger(rangedAttackTrigger);
 

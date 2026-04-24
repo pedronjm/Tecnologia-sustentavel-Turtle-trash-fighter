@@ -38,6 +38,9 @@ public class enemy : MonoBehaviour
 
         isDead = true;
 
+        if (GameControler.instance != null)
+            GameControler.instance.PlayEnemyDeathSound();
+
         if (EnemyState.instance != null)
             EnemyState.instance.MarcarMorto(GetSaveId());
 

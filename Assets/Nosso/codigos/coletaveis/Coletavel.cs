@@ -58,8 +58,7 @@ public abstract class Coletavel : MonoBehaviour
 
     void TocarSomColetar()
     {
-        // Áudio desativado por enquanto
-        // if (GameControler.instance != null && GameControler.instance.audioSource != null && GameControler.instance.coletar != null)
-        //     GameControler.instance.audioSource.PlayOneShot(GameControler.instance.coletar);
+        if (GameControler.instance != null)
+            GameControler.instance.PlayCollectSound();
     }
 }
