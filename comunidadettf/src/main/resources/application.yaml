@@ -3,10 +3,12 @@ server:
 
 spring:
   datasource:
-    url: ${DATASOURCE_URL:jdbc:mysql://localhost:3306/bdttf}
-    username: ${DATASOURCE_USER:root}
+    # If DATASOURCE_URL is provided (e.g. MySQL), it will be used.
+    # Otherwise use embedded H2 for local development to allow the app to start.
+    url: ${DATASOURCE_URL:jdbc:h2:mem:turtle_trash_fighter;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DATASOURCE_USER:sa}
     password: ${DATASOURCE_PWD:}
-    driver-class-name: ${DATASOURCE_DRIVER:com.mysql.cj.jdbc.Driver}
+    driver-class-name: ${DATASOURCE_DRIVER:org.h2.Driver}
 
   jpa:
     hibernate:

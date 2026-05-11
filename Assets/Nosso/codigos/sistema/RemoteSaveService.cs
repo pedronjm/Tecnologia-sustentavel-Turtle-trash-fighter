@@ -10,8 +10,8 @@ using UnityEngine.SceneManagement;
 public class RemoteSaveService : MonoBehaviour
 {
     [Header("Servidor")]
-    [Tooltip("Exemplo: http://localhost:5000")]
-    public string baseUrl = "http://localhost:5000";
+    [Tooltip("Exemplo: http://localhost:8080")]
+    public string baseUrl = "http://localhost:8080";
 
     [Header("Auto Save")]
     public bool autoSaveOnSceneChange;
@@ -55,7 +55,7 @@ public class RemoteSaveService : MonoBehaviour
 
     IEnumerator RegisterRoutine(string username, string password)
     {
-        var req = new AuthRequest { username = username, password = password };
+        var req = new AuthRequest { login = username, password = password, nome = username };
         var json = JsonUtility.ToJson(req);
 
         using var www = BuildJsonRequest("POST", "/auth/register", json, false);
@@ -69,13 +69,13 @@ public class RemoteSaveService : MonoBehaviour
 
         var data = JsonUtility.FromJson<AuthResponse>(www.downloadHandler.text);
         EnsureSession();
-        RemoteAuthSession.instance.SetSession(data.username, data.accessToken);
+        RemoteAuthSession.instance.SetSession(data.login, data.accessToken);
         Debug.Log("Registro concluido e sessao autenticada.");
     }
 
     IEnumerator LoginRoutine(string username, string password)
     {
-        var req = new AuthRequest { username = username, password = password };
+        var req = new AuthRequest { login = username, password = password };
         var json = JsonUtility.ToJson(req);
 
         using var www = BuildJsonRequest("POST", "/auth/login", json, false);
@@ -89,7 +89,7 @@ public class RemoteSaveService : MonoBehaviour
 
         var data = JsonUtility.FromJson<AuthResponse>(www.downloadHandler.text);
         EnsureSession();
-        RemoteAuthSession.instance.SetSession(data.username, data.accessToken);
+        RemoteAuthSession.instance.SetSession(data.login, data.accessToken);
         Debug.Log("Login concluido.");
     }
 
@@ -101,7 +101,7 @@ public class RemoteSaveService : MonoBehaviour
         var payload = BuildSavePayload();
         var json = JsonUtility.ToJson(payload);
 
-        using var www = BuildJsonRequest("PUT", "/save", json, true);
+        using var www = BuildJsonRequest("PUT", "/saves", json, true);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -118,7 +118,7 @@ public class RemoteSaveService : MonoBehaviour
         if (!ValidateAuth())
             yield break;
 
-        using var www = BuildJsonRequest("GET", "/save", null, true);
+        using var www = BuildJsonRequest("GET", "/saves/0", null, true);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -133,7 +133,19 @@ public class RemoteSaveService : MonoBehaviour
             yield break;
         }
 
-        var payload = JsonUtility.FromJson<SavePayload>(www.downloadHandler.text);
+        var response = JsonUtility.FromJson<SaveResponse>(www.downloadHandler.text);
+        var payload = new SavePayload
+        {
+            sceneName = response.sceneName,
+            selectedCharacter = response.selectedCharacter,
+            playTutorial = response.playTutorial,
+            difficulty = response.difficulty,
+            collectedIds = ParseStringList(response.collectedIdsJson),
+            deadEnemyIds = ParseStringList(response.deadEnemyIdsJson),
+            checkpointId = response.checkpointId,
+            checkpointPosition = new Vector3Data(new Vector3(response.checkpointX, response.checkpointY, response.checkpointZ)),
+            completionPercent = response.completionPercent
+        };
         ApplySavePayload(payload);
         Debug.Log("Load remoto concluido.");
     }
@@ -284,15 +296,42 @@ public class RemoteSaveService : MonoBehaviour
     [Serializable]
     class AuthRequest
     {
-        public string username;
+        public string login;
         public string password;
+        public string nome;
     }
 
     [Serializable]
     class AuthResponse
     {
         public string accessToken;
-        public string username;
+        public string login;
+        public string nome;
+    }
+
+    [Serializable]
+    class SaveResponse
+    {
+        public int slotIndex;
+        public string slotName;
+        public string selectedCharacter;
+        public bool playTutorial;
+        public string difficulty;
+        public string sceneName;
+        public string checkpointId;
+        public float checkpointX;
+        public float checkpointY;
+        public float checkpointZ;
+        public string collectedIdsJson;
+        public string deadEnemyIdsJson;
+        public float completionPercent;
+        public string lastSavedAtUtc;
+    }
+
+    [Serializable]
+    class StringListWrapper
+    {
+        public List<string> values = new List<string>();
     }
 
     [Serializable]
@@ -327,5 +366,15 @@ public class RemoteSaveService : MonoBehaviour
         {
             return new Vector3(x, y, z);
         }
+    }
+
+    static List<string> ParseStringList(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return new List<string>();
+
+        var wrapperJson = "{\"values\":" + json + "}";
+        var wrapper = JsonUtility.FromJson<StringListWrapper>(wrapperJson);
+        return wrapper?.values ?? new List<string>();
     }
 }
