@@ -372,7 +372,7 @@ AnimatorStateTransition:
   - m_ConditionMode: 2
     m_ConditionEvent: doublejump
     m_EventTreshold: 0
-  - m_ConditionMode: 1
+  - m_ConditionMode: 2
     m_ConditionEvent: fall
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}

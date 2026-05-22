@@ -73,6 +73,7 @@
     <Compile Include="Assets\Nosso\codigos\coletaveis\garrafa.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\RemoteSaveService.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\SaveSlotManager.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\menu\MenuHandler.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\NewGameSessionSettings.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\CheckpointState.cs" />
     <Compile Include="Assets\Nosso\codigos\player\PlayerWarrior.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Assets\Nosso\codigos\sistema\GameControler.cs" />
     <Compile Include="Assets\Nosso\codigos\combate\damageble.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\CheckpointTrigger.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\menu\PauseMenu.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuSavesController.cs" />
     <Compile Include="Assets\Nosso\codigos\player\SelectedCharacterActivator.cs" />
   </ItemGroup>
