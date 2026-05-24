@@ -245,10 +245,13 @@ public abstract class Player : MonoBehaviour
         if (sprite != null)
             sprite.flipX = !sprite.flipX;
 
+        anim.SetBool("walk", false);
         rig.linearVelocity = new Vector2(dashDirection * dashforce, 0f);
         anim.SetBool("dash", true);
         yield return new WaitForSeconds(0.2f);
+
         anim.SetBool("dash", false);
+        anim.SetBool("walk", Mathf.Abs(GetMovementAxis()) > 0f);
 
         if (sprite != null)
             sprite.flipX = !sprite.flipX;

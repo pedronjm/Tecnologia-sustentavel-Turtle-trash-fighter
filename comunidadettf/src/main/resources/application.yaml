@@ -1,0 +1,27 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    # If DATASOURCE_URL is provided (e.g. MySQL), it will be used.
+    # Otherwise use embedded H2 for local development to allow the app to start.
+    url: ${DATASOURCE_URL:jdbc:h2:mem:turtle_trash_fighter;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DATASOURCE_USER:sa}
+    password: ${DATASOURCE_PWD:}
+    driver-class-name: ${DATASOURCE_DRIVER:org.h2.Driver}
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # create, create-drop, validate, none, update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  application:
+    name: comunidadettf
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:troque-essa-chave-super-segura-para-o-spring-ttf-123456}
+      ttl-minutes: ${JWT_TTL_MINUTES:120}
