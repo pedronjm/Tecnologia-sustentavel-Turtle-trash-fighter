@@ -14,6 +14,8 @@ public class enemy : MonoBehaviour
 
     protected bool isDead = false;
 
+    
+
     protected virtual void Start()
     {
         if (EnemyState.instance != null)
@@ -75,4 +77,5 @@ public class enemy : MonoBehaviour
         float side = transform.position.x < attackPos.x ? -1f : 1f;
         rig.AddForce(new Vector2(side * 5f, 2f), ForceMode2D.Impulse);
     }
+    
 }

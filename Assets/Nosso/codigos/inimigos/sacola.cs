@@ -4,7 +4,7 @@ using UnityEngine;
 public class sacola : enemy
 {
     public LayerMask collisionLayer;
-    public Transform groundCheck; // Use apenas um ponto na frente para detectar abismos
+    public Transform groundCheckPoint; // Use apenas um ponto na frente para detectar abismos
     public Transform wallCheck; // Use um ponto na frente para detectar paredes
     public Transform visualRoot;
     public bool invertVisualFacing = false;
@@ -39,8 +39,8 @@ public class sacola : enemy
         if (visualRoot != null)
             visualBaseLocalScale = visualRoot.localScale;
 
-        if (groundCheck != null)
-            groundCheckBaseLocalPosition = groundCheck.localPosition;
+        if (groundCheckPoint != null)
+            groundCheckBaseLocalPosition = groundCheckPoint.localPosition;
 
         if (wallCheck != null)
             wallCheckBaseLocalPosition = wallCheck.localPosition;
@@ -70,7 +70,7 @@ public class sacola : enemy
 
     private bool ShouldTurn()
     {
-        if (groundCheck == null || wallCheck == null)
+        if (groundCheckPoint == null || wallCheck == null)
             return false;
 
         bool wallHit = HasValidRayHit(
@@ -80,7 +80,7 @@ public class sacola : enemy
         );
 
         bool groundAhead = HasValidRayHit(
-            (Vector2)groundCheck.position
+            (Vector2)groundCheckPoint.position
                 + Vector2.right * facingDirection * groundLookAheadDistance,
             Vector2.down,
             groundCheckDistance
@@ -100,9 +100,9 @@ public class sacola : enemy
     {
         ApplyVisualFacing(facingDirection);
 
-        if (groundCheck != null)
+        if (groundCheckPoint != null)
         {
-            groundCheck.localPosition = new Vector3(
+            groundCheckPoint.localPosition = new Vector3(
                 Mathf.Abs(groundCheckBaseLocalPosition.x) * facingDirection,
                 groundCheckBaseLocalPosition.y,
                 groundCheckBaseLocalPosition.z
@@ -165,6 +165,10 @@ public class sacola : enemy
             if (hit.transform == transform || hit.transform.IsChildOf(transform))
                 continue;
 
+            // Ignora o Player para que o inimigo não trate o jogador como parede
+            if (hit.CompareTag("Player") || hit.GetComponent<Player>() != null)
+                continue;
+
             return true;
         }
 
@@ -173,11 +177,11 @@ public class sacola : enemy
 
     private void OnDrawGizmosSelected()
     {
-        if (groundCheck != null)
+        if (groundCheckPoint != null)
         {
             int drawDir = Application.isPlaying ? facingDirection : 1;
             Vector3 groundStart =
-                groundCheck.position + Vector3.right * drawDir * groundLookAheadDistance;
+                groundCheckPoint.position + Vector3.right * drawDir * groundLookAheadDistance;
             Vector3 groundEnd = groundStart + Vector3.down * groundCheckDistance;
 
             Gizmos.color = Color.yellow;

@@ -51,6 +51,32 @@ public abstract class Player : MonoBehaviour
     protected SpriteRenderer sprite;
     public static Player player;
 
+    // Hit / stun handling
+    float speedMultiplier = 1f;
+    bool directionLocked = false;
+    Coroutine hitEffectCoroutine;
+
+    /// <summary>Aplica efeito de hit: reduz velocidade por 'duration' e opcionalmente bloqueia mudança de direção.</summary>
+    public void ApplyHitEffect(float duration, float speedFactor = 0.25f, bool lockDirection = true)
+    {
+        if (hitEffectCoroutine != null)
+            StopCoroutine(hitEffectCoroutine);
+
+        hitEffectCoroutine = StartCoroutine(
+            HitEffectCoroutine(duration, speedFactor, lockDirection)
+        );
+    }
+
+    IEnumerator HitEffectCoroutine(float duration, float speedFactor, bool lockDirection)
+    {
+        speedMultiplier = Mathf.Clamp01(speedFactor);
+        directionLocked = lockDirection;
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        directionLocked = false;
+        hitEffectCoroutine = null;
+    }
+
     protected virtual void Start()
     {
         rig = GetComponent<Rigidbody2D>();
@@ -160,10 +186,11 @@ public abstract class Player : MonoBehaviour
             return;
         }
 
-        rig.linearVelocity = new Vector2(horizontal * Speed, rig.linearVelocity.y);
+        float currentSpeed = Speed * speedMultiplier;
+        rig.linearVelocity = new Vector2(horizontal * currentSpeed, rig.linearVelocity.y);
         bool hasHorizontalVelocity = Mathf.Abs(rig.linearVelocity.x) != 0.0f;
 
-        if (horizontal != 0)
+        if (horizontal != 0 && !directionLocked)
         {
             transform.localScale = new Vector3(
                 Mathf.Sign(horizontal) * Mathf.Abs(transform.localScale.x),
