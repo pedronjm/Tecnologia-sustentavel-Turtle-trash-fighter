@@ -1,5 +1,7 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Necessário se for mudar de cena
+using UnityEngine.SceneManagement;
+using UnityEngine.UI; // Necessário para interagir com UI
+using TMPro; // Use se estiver usando TextMeshPro // Necessário se for mudar de cena
 
 public class MenuHandler : MonoBehaviour
 {
@@ -7,6 +9,7 @@ public class MenuHandler : MonoBehaviour
     public GameObject MainMenuPanel;
     public GameObject SettingsPanel;
     public GameObject VolumePanel;
+    public GameObject ContatoPanel;
 
     public void VoltarParaMenu()
     {
@@ -33,5 +36,36 @@ public class MenuHandler : MonoBehaviour
     {
         // Exemplo de como iniciar o jogo, pode ser adaptado para abrir um painel de seleção de personagem ou opções
         SceneManager.LoadScene("SampleScene"); // Substitua pelo nome da cena do jogo
+    }
+
+
+    [Header("Configurações de Cópia")]
+    public string infoContato = "seuemail@exemplo.com";
+
+    // Abre a tela de contato e esconde a de settings
+    public void AbrirContato()
+    {
+        if (ContatoPanel != null && SettingsPanel != null)
+        {
+            ContatoPanel.SetActive(true);
+            SettingsPanel.SetActive(false);
+        }
+    }
+
+    // Volta para a tela de settings
+    public void FecharContato()
+    {
+        if (ContatoPanel != null && SettingsPanel != null)
+        {
+            ContatoPanel.SetActive(false);
+            SettingsPanel.SetActive(true);
+        }
+    }
+
+    // Função para copiar o texto
+    public void CopiarParaAreaDeTransferencia()
+    {
+        GUIUtility.systemCopyBuffer = infoContato;
+        Debug.Log("Copiado: " + infoContato);
     }
 }
