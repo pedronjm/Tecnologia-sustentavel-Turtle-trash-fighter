@@ -41,7 +41,7 @@ public abstract class Player : MonoBehaviour
     bool jumpResetByWallContact;
     float wallJumpLockTimer;
     float wallDirection;
-    int jumpsUsed;
+    int jumpsUsed; //feature
     float jumpResetLockTimer;
     float groundedGraceTimer;
 
