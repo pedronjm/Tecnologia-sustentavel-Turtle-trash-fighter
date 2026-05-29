@@ -22,13 +22,15 @@ public class MenuHandler : MonoBehaviour
 
     public void VoltarParaSettings()
     {
-        if (VolumePanel.getActive()){
-        VolumePanel.SetActive(false);
-        SettingsPanel.SetActive(true);
+        if (VolumePanel != null && VolumePanel.activeSelf)
+        {
+            VolumePanel.SetActive(false);
+            SettingsPanel.SetActive(true);
         }
-        else if (KeyBindsPanel.getActive()){
-        KeyBindsPanel.SetActive(false);
-        SettingsPanel.SetActive(true);
+        else if (KeyBindsPanel != null && KeyBindsPanel.activeSelf)
+        {
+            KeyBindsPanel.SetActive(false);
+            SettingsPanel.SetActive(true);
         }
     }
 

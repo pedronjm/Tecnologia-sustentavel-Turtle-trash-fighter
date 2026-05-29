@@ -323,10 +323,10 @@ public abstract class Player : MonoBehaviour
 
             anim.SetBool("wall", true);
 
-            Debug.Log(
-                $"[WallSlide] estado={isWallSliding} tocandoParede={isTouchingWall} caindo={rig.linearVelocity.y < 0f} inputParede={pressingTowardWall} velY={rig.linearVelocity.y}",
-                this
-            );
+            // Debug.Log(
+            //     $"[WallSlide] estado={isWallSliding} tocandoParede={isTouchingWall} caindo={rig.linearVelocity.y < 0f} inputParede={pressingTowardWall} velY={rig.linearVelocity.y}",
+            //     this
+            // );
         }
         else
         {
@@ -336,10 +336,10 @@ public abstract class Player : MonoBehaviour
 
         if (debugWallSlide && lastLoggedWallSlide != isWallSliding)
         {
-            Debug.Log(
-                $"[WallSlide] estado={isWallSliding} tocandoParede={isTouchingWall} caindo={rig.linearVelocity.y < 0f} inputParede={pressingTowardWall} velY={rig.linearVelocity.y}",
-                this
-            );
+            // Debug.Log(
+            //     $"[WallSlide] estado={isWallSliding} tocandoParede={isTouchingWall} caindo={rig.linearVelocity.y < 0f} inputParede={pressingTowardWall} velY={rig.linearVelocity.y}",
+            //     this
+            // );
             lastLoggedWallSlide = isWallSliding;
         }
     }
