@@ -10,6 +10,7 @@ public class MenuHandler : MonoBehaviour
     public GameObject SettingsPanel;
     public GameObject VolumePanel;
     public GameObject ContatoPanel;
+    public GameObject KeyBindsPanel;
 
     public void VoltarParaMenu()
     {
@@ -18,17 +19,30 @@ public class MenuHandler : MonoBehaviour
         MainMenuPanel.SetActive(true);
     }
 
+
     public void VoltarParaSettings()
     {
-        // Desativa a tela de volume e ativa a de configurações
+        if (VolumePanel.getActive()){
         VolumePanel.SetActive(false);
         SettingsPanel.SetActive(true);
+        }
+        else if (KeyBindsPanel.getActive()){
+        KeyBindsPanel.SetActive(false);
+        SettingsPanel.SetActive(true);
+        }
     }
 
     public void AbrirVolume()
     {
         // Desativa a tela de volume e ativa a de configurações
         VolumePanel.SetActive(true);
+        SettingsPanel.SetActive(false);
+    }
+
+    public void AbrirKeyBinds()
+    {
+        // Desativa a tela de binds e ativa a de configurações
+        KeyBindsPanel.SetActive(true);
         SettingsPanel.SetActive(false);
     }
 

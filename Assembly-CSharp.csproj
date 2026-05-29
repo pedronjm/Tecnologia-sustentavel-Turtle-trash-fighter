@@ -60,6 +60,7 @@
     <Compile Include="Assets\Nosso\codigos\inimigos\sacola.cs" />
     <Compile Include="Assets\Nosso\codigos\combate\Projectile.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuContactsController.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\InputManager.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\EnemyHealthBar.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\ColetavelState.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\RemoteAuthSession.cs" />
