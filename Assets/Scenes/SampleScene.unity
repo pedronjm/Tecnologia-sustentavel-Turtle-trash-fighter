@@ -615,9 +615,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Checkpoint '
       objectReference: {fileID: 0}
+    - target: {fileID: 4061479768142305028, guid: c83dfd87959018c4f9be0a5f6927fc1a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8081168133608847898, guid: c83dfd87959018c4f9be0a5f6927fc1a, type: 3}
       propertyPath: checkpointId
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8081168133608847898, guid: c83dfd87959018c4f9be0a5f6927fc1a, type: 3}
+      propertyPath: interactionMessageTemplate
+      value: Salvar ponto de respawn? Pressione f
+      objectReference: {fileID: 0}
+    - target: {fileID: 8652580604856355096, guid: c83dfd87959018c4f9be0a5f6927fc1a, type: 3}
+      propertyPath: m_text
+      value: "Salvar ponto de respawn? \nPressione E"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

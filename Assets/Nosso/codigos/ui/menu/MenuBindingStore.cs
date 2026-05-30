@@ -7,12 +7,13 @@ using UnityEngine.InputSystem.LowLevel;
 
 public enum MenuActionId
 {
-    MoveLeft,
-    MoveRight,
-    Jump,
-    Dash,
-    MeleeAttack,
-    RangedAttack,
+    MoveLeft = 0,
+    MoveRight = 1,
+    Jump = 2,
+    Dash = 3,
+    MeleeAttack = 4,
+    RangedAttack = 5,
+    Interact = 6,
 }
 
 public enum MouseButton
@@ -42,6 +43,7 @@ public static class MenuBindingStore
         [MenuActionId.MoveRight] = new BindingData { isMouse = false, keyboardKey = Key.D },
         [MenuActionId.Jump] = new BindingData { isMouse = false, keyboardKey = Key.Space },
         [MenuActionId.Dash] = new BindingData { isMouse = false, keyboardKey = Key.LeftShift },
+        [MenuActionId.Interact] = new BindingData { isMouse = false, keyboardKey = Key.E },
         [MenuActionId.MeleeAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Left },
         [MenuActionId.RangedAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Right },
     };
@@ -78,6 +80,7 @@ public static class MenuBindingStore
         bindings[MenuActionId.MoveRight] = new BindingData { isMouse = false, keyboardKey = Key.D };
         bindings[MenuActionId.Jump] = new BindingData { isMouse = false, keyboardKey = Key.Space };
         bindings[MenuActionId.Dash] = new BindingData { isMouse = false, keyboardKey = Key.LeftShift };
+        bindings[MenuActionId.Interact] = new BindingData { isMouse = false, keyboardKey = Key.E };
         bindings[MenuActionId.MeleeAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Left };
         bindings[MenuActionId.RangedAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Right };
 
@@ -145,20 +148,60 @@ public static class MenuBindingStore
 
     public static void SetKeyboardBinding(MenuActionId action, Key key)
     {
+        EnsureLoaded(); 
+
+        BindingData currentBinding = bindings[action];
+        if (!currentBinding.isMouse && currentBinding.keyboardKey == key)
+            return;
+
+        MenuActionId? conflictingAction = FindKeyboardAction(key);
+        if (conflictingAction.HasValue && conflictingAction.Value != action)
+            bindings[conflictingAction.Value] = currentBinding;
+
         bindings[action] = new BindingData { isMouse = false, keyboardKey = key };
         isLoaded = true;
-        SaveBinding(action);
-        PlayerPrefs.Save();
+        SaveAll();
         BindingsChanged?.Invoke();
     }
 
     public static void SetMouseBinding(MenuActionId action, MouseButton mouseButton)
     {
+        EnsureLoaded();
+
+        BindingData currentBinding = bindings[action];
+        if (currentBinding.isMouse && currentBinding.mouseButton == mouseButton)
+            return;
+
+        MenuActionId? conflictingAction = FindMouseAction(mouseButton);
+        if (conflictingAction.HasValue && conflictingAction.Value != action)
+            bindings[conflictingAction.Value] = currentBinding;
+
         bindings[action] = new BindingData { isMouse = true, mouseButton = mouseButton };
         isLoaded = true;
-        SaveBinding(action);
-        PlayerPrefs.Save();
+        SaveAll();
         BindingsChanged?.Invoke();
+    }
+
+    private static MenuActionId? FindKeyboardAction(Key key)
+    {
+        foreach (KeyValuePair<MenuActionId, BindingData> pair in bindings)
+        {
+            if (!pair.Value.isMouse && pair.Value.keyboardKey == key)
+                return pair.Key;
+        }
+
+        return null;
+    }
+
+    private static MenuActionId? FindMouseAction(MouseButton mouseButton)
+    {
+        foreach (KeyValuePair<MenuActionId, BindingData> pair in bindings)
+        {
+            if (pair.Value.isMouse && pair.Value.mouseButton == mouseButton)
+                return pair.Key;
+        }
+
+        return null;
     }
 
     private static string SerializeBinding(BindingData binding)

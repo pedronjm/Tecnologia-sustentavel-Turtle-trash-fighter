@@ -1,6 +1,7 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class CheckpointTrigger : MonoBehaviour
 {
@@ -11,7 +12,8 @@ public class CheckpointTrigger : MonoBehaviour
     [SerializeField] private GameObject interactionPrompt;
     [SerializeField] private TMP_Text interactionPromptText;
     [TextArea]
-    [SerializeField] private string interactionMessage = "Salvar ponto de respawn? Pressione E";
+    [FormerlySerializedAs("interactionMessage")]
+    [SerializeField] private string interactionMessageTemplate = "Salvar ponto de respawn? Pressione {0}";
 
     [Header("Status do Checkpoint")]
     [SerializeField] private GameObject selectedCheckpointCanvas;
@@ -25,10 +27,22 @@ public class CheckpointTrigger : MonoBehaviour
 
     void Awake()
     {
+        MenuBindingStore.EnsureLoaded();
         AutoAssignPromptReferences();
         AutoAssignSelectedReferences();
+        Debug.Log($"CheckpointTrigger.Awake promptText={(interactionPromptText != null ? interactionPromptText.name : "null")} selectedText={(selectedCheckpointText != null ? selectedCheckpointText.name : "null")}");
         HidePrompt();
         HideSelectedCanvas();
+    }
+
+    private void OnEnable()
+    {
+        MenuBindingStore.BindingsChanged += HandleBindingsChanged;
+    }
+
+    private void OnDisable()
+    {
+        MenuBindingStore.BindingsChanged -= HandleBindingsChanged;
     }
 
     private string GetCheckpointId()
@@ -73,7 +87,7 @@ public class CheckpointTrigger : MonoBehaviour
         if (!playerInRange || checkpointSavedThisVisit || checkpointAlreadySelected)
             return;
 
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (MenuBindingStore.WasPressedThisFrame(MenuActionId.Interact))
             SaveCheckpoint();
     }
 
@@ -85,7 +99,9 @@ public class CheckpointTrigger : MonoBehaviour
         if (interactionPromptText != null)
         {
             interactionPromptText.gameObject.SetActive(true);
-            interactionPromptText.text = interactionMessage;
+            string interactLabel = MenuBindingStore.GetDisplayName(MenuActionId.Interact);
+            interactionPromptText.text = string.Format(interactionMessageTemplate, interactLabel);
+            Debug.Log($"CheckpointTrigger.ShowPrompt label='{interactLabel}' text='{interactionPromptText.text}'");
         }
 
         HideSelectedCanvas();
@@ -109,6 +125,7 @@ public class CheckpointTrigger : MonoBehaviour
         {
             selectedCheckpointText.gameObject.SetActive(true);
             selectedCheckpointText.text = selectedCheckpointMessage;
+            Debug.Log($"CheckpointTrigger.ShowSelectedCanvas text='{selectedCheckpointMessage}'");
         }
 
         HidePrompt();
@@ -125,46 +142,44 @@ public class CheckpointTrigger : MonoBehaviour
 
     private void AutoAssignPromptReferences()
     {
+        if (interactionPrompt == null)
+        {
+            Canvas canvas = GetComponentInChildren<Canvas>(true);
+            if (canvas != null)
+                interactionPrompt = canvas.gameObject;
+        }
+
+        if (interactionPromptText == null && interactionPrompt != null)
+            interactionPromptText = interactionPrompt.GetComponentInChildren<TMP_Text>(true);
+
         if (interactionPromptText == null)
             interactionPromptText = GetComponentInChildren<TMP_Text>(true);
 
-        if (interactionPrompt == null)
-        {
-            if (interactionPromptText != null)
-            {
-                interactionPrompt = interactionPromptText.transform.parent != null
-                    ? interactionPromptText.transform.parent.gameObject
-                    : interactionPromptText.gameObject;
-            }
-            else
-            {
-                Canvas canvas = GetComponentInChildren<Canvas>(true);
-                if (canvas != null)
-                    interactionPrompt = canvas.gameObject;
-            }
-        }
-
         if (interactionPrompt == null && interactionPromptText != null)
-            interactionPrompt = interactionPromptText.gameObject;
+            interactionPrompt = interactionPromptText.transform.parent != null
+                ? interactionPromptText.transform.parent.gameObject
+                : interactionPromptText.gameObject;
     }
 
     private void AutoAssignSelectedReferences()
     {
+        if (selectedCheckpointCanvas == null)
+        {
+            Canvas canvas = GetComponentInChildren<Canvas>(true);
+            if (canvas != null)
+                selectedCheckpointCanvas = canvas.gameObject;
+        }
+
+        if (selectedCheckpointText == null && selectedCheckpointCanvas != null)
+            selectedCheckpointText = selectedCheckpointCanvas.GetComponentInChildren<TMP_Text>(true);
+
         if (selectedCheckpointText == null)
             selectedCheckpointText = GetComponentInChildren<TMP_Text>(true);
 
-        if (selectedCheckpointCanvas == null)
-        {
-            if (selectedCheckpointText != null)
-            {
-                selectedCheckpointCanvas = selectedCheckpointText.transform.parent != null
-                    ? selectedCheckpointText.transform.parent.gameObject
-                    : selectedCheckpointText.gameObject;
-            }
-        }
-
         if (selectedCheckpointCanvas == null && selectedCheckpointText != null)
-            selectedCheckpointCanvas = selectedCheckpointText.gameObject;
+            selectedCheckpointCanvas = selectedCheckpointText.transform.parent != null
+                ? selectedCheckpointText.transform.parent.gameObject
+                : selectedCheckpointText.gameObject;
     }
 
     private bool IsPlayer(Collider2D other)
@@ -205,5 +220,20 @@ public class CheckpointTrigger : MonoBehaviour
 
         if (CheckpointState.instance != null)
             Debug.Log($"Checkpoint ativado: {CheckpointState.instance.CurrentCheckpointId}");
+    }
+
+    private void HandleBindingsChanged()
+    {
+        if (!playerInRange)
+            return;
+
+        if (checkpointAlreadySelected)
+        {
+            ShowSelectedCanvas();
+            return;
+        }
+
+        if (!checkpointSavedThisVisit)
+            ShowPrompt();
     }
 }

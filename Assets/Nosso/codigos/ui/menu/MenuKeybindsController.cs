@@ -25,22 +25,41 @@ public class MenuKeybindsController : MonoBehaviour
     [SerializeField]
     private Button resetButton;
 
+    [Header("Popup de Rebind")]
+    [SerializeField]
+    private GameObject rebindPopupPanel;
+
+    [SerializeField]
+    private TMP_Text rebindPopupText;
+
+    [TextArea]
+    [SerializeField]
+    private string rebindPopupMessage = "Pressione uma tecla ou botão do mouse para {0}. ESC cancela.";
+
     private int activeRowIndex = -1;
     private bool hasWiredButtons;
 
     private void Awake()
     {
+        Debug.Log("MenuKeybindsController.Awake()");
+        if (statusLabel != null) statusLabel.text = "MenuKeybindsController Awake";
         MenuBindingStore.EnsureLoaded();
+        HidePopup();
+        WireButtonsOnce();
     }
 
     private void Start()
     {
-        WireButtonsOnce();
+        Debug.Log("MenuKeybindsController.Start()");
+        if (statusLabel != null) statusLabel.text = "MenuKeybindsController Start";
         RefreshAllLabels();
     }
 
     private void OnEnable()
     {
+        Debug.Log("MenuKeybindsController.OnEnable()");
+        if (statusLabel != null) statusLabel.text = "MenuKeybindsController OnEnable";
+        WireButtonsOnce();
         RefreshAllLabels();
     }
 
@@ -62,6 +81,7 @@ public class MenuKeybindsController : MonoBehaviour
 
     private void WireButtonsOnce()
     {
+        Debug.Log("WireButtonsOnce() called");
         if (hasWiredButtons)
             return;
 
@@ -71,13 +91,19 @@ public class MenuKeybindsController : MonoBehaviour
             BindingRow row = rows[index];
 
             if (row != null && row.rebindButton != null)
-                row.rebindButton.onClick.AddListener(() => BeginRebind(capturedIndex));
+                row.rebindButton.onClick.AddListener(() => { Debug.Log($"Rebind button clicked for row {capturedIndex} ({rows[capturedIndex].action})"); BeginRebind(capturedIndex); });
         }
 
         if (resetButton != null)
+        {
             resetButton.onClick.AddListener(ResetToDefaults);
+            Debug.Log("Wired resetButton.onClick -> ResetToDefaults");
+            if (statusLabel != null) statusLabel.text = "Wired reset button";
+        }
 
         hasWiredButtons = true;
+        Debug.Log("WireButtonsOnce() finished wiring buttons");
+        if (statusLabel != null) statusLabel.text = "Wired rebind buttons";
     }
 
     public void BeginRebind(int rowIndex)
@@ -87,7 +113,8 @@ public class MenuKeybindsController : MonoBehaviour
 
         activeRowIndex = rowIndex;
         string actionLabel = GetActionLabel(rows[rowIndex].action);
-        SetStatusText($"Pressione uma tecla ou clique um botão do mouse para {actionLabel}");
+        Debug.Log($"BeginRebind called for {rowIndex} -> {rows[rowIndex].action}");
+        ShowPopup(string.Format(rebindPopupMessage, actionLabel));
     }
 
     private void ListenForBinding()
@@ -104,16 +131,13 @@ public class MenuKeybindsController : MonoBehaviour
                 return;
             }
 
-            foreach (Key key in Enum.GetValues(typeof(Key)))
+            foreach (KeyControl keyControl in Keyboard.current.allKeys)
             {
-                if (key == Key.None || Keyboard.current.anyKey.wasPressedThisFrame == false)
-                    continue;
-
-                KeyControl keyControl = Keyboard.current[key];
                 if (keyControl != null && keyControl.wasPressedThisFrame)
                 {
-                    MenuBindingStore.SetKeyboardBinding(row.action, key);
-                    FinishRebind($"{GetActionLabel(row.action)} alterado para {key}");
+                    Debug.Log($"Key pressed captured: {keyControl.keyCode} for action {row.action}");
+                    MenuBindingStore.SetKeyboardBinding(row.action, keyControl.keyCode);
+                    FinishRebind($"{GetActionLabel(row.action)} alterado para {keyControl.keyCode}");
                     return;
                 }
             }
@@ -124,6 +148,7 @@ public class MenuKeybindsController : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            Debug.Log($"Mouse Left pressed for action {row.action}");
             MenuBindingStore.SetMouseBinding(row.action, MouseButton.Left);
             FinishRebind($"{GetActionLabel(row.action)} alterado para Mouse Esquerdo");
             return;
@@ -131,6 +156,7 @@ public class MenuKeybindsController : MonoBehaviour
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
+            Debug.Log($"Mouse Right pressed for action {row.action}");
             MenuBindingStore.SetMouseBinding(row.action, MouseButton.Right);
             FinishRebind($"{GetActionLabel(row.action)} alterado para Mouse Direito");
             return;
@@ -138,6 +164,7 @@ public class MenuKeybindsController : MonoBehaviour
 
         if (Mouse.current.middleButton.wasPressedThisFrame)
         {
+            Debug.Log($"Mouse Middle pressed for action {row.action}");
             MenuBindingStore.SetMouseBinding(row.action, MouseButton.Middle);
             FinishRebind($"{GetActionLabel(row.action)} alterado para Mouse Meio");
             return;
@@ -145,6 +172,7 @@ public class MenuKeybindsController : MonoBehaviour
 
         if (Mouse.current.forwardButton.wasPressedThisFrame)
         {
+            Debug.Log($"Mouse Forward pressed for action {row.action}");
             MenuBindingStore.SetMouseBinding(row.action, MouseButton.Forward);
             FinishRebind($"{GetActionLabel(row.action)} alterado para Mouse Forward");
             return;
@@ -152,6 +180,7 @@ public class MenuKeybindsController : MonoBehaviour
 
         if (Mouse.current.backButton.wasPressedThisFrame)
         {
+            Debug.Log($"Mouse Back pressed for action {row.action}");
             MenuBindingStore.SetMouseBinding(row.action, MouseButton.Back);
             FinishRebind($"{GetActionLabel(row.action)} alterado para Mouse Back");
         }
@@ -160,6 +189,7 @@ public class MenuKeybindsController : MonoBehaviour
     private void FinishRebind(string message)
     {
         activeRowIndex = -1;
+        HidePopup();
         SetStatusText(message);
         RefreshAllLabels();
     }
@@ -167,6 +197,7 @@ public class MenuKeybindsController : MonoBehaviour
     private void CancelRebind()
     {
         activeRowIndex = -1;
+        HidePopup();
         SetStatusText("Troca de atalho cancelada.");
     }
 
@@ -191,6 +222,21 @@ public class MenuKeybindsController : MonoBehaviour
             statusLabel.text = message;
     }
 
+    private void ShowPopup(string message)
+    {
+        if (rebindPopupPanel != null)
+            rebindPopupPanel.SetActive(true);
+
+        if (rebindPopupText != null)
+            rebindPopupText.text = message;
+    }
+
+    private void HidePopup()
+    {
+        if (rebindPopupPanel != null)
+            rebindPopupPanel.SetActive(false);
+    }
+
     private static string GetActionLabel(MenuActionId action)
     {
         return action switch
@@ -199,6 +245,7 @@ public class MenuKeybindsController : MonoBehaviour
             MenuActionId.MoveRight => "Mover direita",
             MenuActionId.Jump => "Pular",
             MenuActionId.Dash => "Dash",
+            MenuActionId.Interact => "Interagir",
             MenuActionId.MeleeAttack => "Ataque corpo a corpo",
             MenuActionId.RangedAttack => "Ataque à distância",
             _ => action.ToString(),
