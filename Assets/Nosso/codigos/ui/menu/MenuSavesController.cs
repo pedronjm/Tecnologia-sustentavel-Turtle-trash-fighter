@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,292 +5,153 @@ using UnityEngine.UI;
 
 public class MenuSavesController : MonoBehaviour
 {
-    [SerializeField] private Transform slotsContainer;
-    [SerializeField] private GameObject slotPrefab;
-    [SerializeField] private TMP_Text selectedSlotLabel;
-    [SerializeField] private Button loadButton;
-    [SerializeField] private Button saveButton;
-    [SerializeField] private Button deleteButton;
-    [SerializeField] private Button newGameButton;
-    [SerializeField] private TMP_Text statusLabel;
-    [SerializeField] private MenuNewGameFlowController newGameFlowController;
+    [Header("Slots")]
+    [SerializeField]
+    private Button[] slotButtons;
 
-    private int selectedSlotIndex = -1;
-    private List<SaveSlotUI> slotUIs = new List<SaveSlotUI>();
-    private bool hasWiredButtons;
+    [SerializeField]
+    private TMP_Text[] slotTexts;
 
-    private void OnEnable()
+    [Header("Botoes")]
+    [SerializeField]
+    private Button loadButton;
+
+    [SerializeField]
+    private Button deleteButton;
+
+    private int selectedSlot = -1;
+
+    private void Start()
     {
-        RefreshSlots();
-        WireButtons();
+        AtualizarSlots();
 
-        if (newGameFlowController == null)
-            newGameFlowController = FindFirstObjectByType<MenuNewGameFlowController>();
+        loadButton.onClick.AddListener(CarregarSave);
+        deleteButton.onClick.AddListener(DeletarSave);
 
-        SaveSlotManager.SavesChanged += RefreshSlots;
-    }
-
-    private void OnDisable()
-    {
-        SaveSlotManager.SavesChanged -= RefreshSlots;
-    }
-
-    public void RefreshSlots()
-    {
-        // Limpa UI antiga
-        foreach (Transform child in slotsContainer)
-            Destroy(child.gameObject);
-
-        slotUIs.Clear();
-
-        // Cria nova UI
-        List<SaveSlot> slots = SaveSlotManager.GetAllSlots();
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < slotButtons.Length; i++)
         {
-            CreateSlotUI(slots[i]);
+            int index = i;
+
+            slotButtons[i]
+                .onClick.AddListener(() =>
+                {
+                    SelecionarSlot(index);
+                });
         }
 
-        selectedSlotIndex = -1;
-        UpdateButtonStates();
+        AtualizarBotoes();
     }
 
-    private void CreateSlotUI(SaveSlot slot)
+    private void AtualizarSlots()
     {
-        GameObject slotGO = Instantiate(slotPrefab, slotsContainer);
-        SaveSlotUI slotUI = slotGO.GetComponent<SaveSlotUI>();
-
-        if (slotUI == null)
-            slotUI = slotGO.AddComponent<SaveSlotUI>();
-
-        slotUI.Initialize(slot, OnSlotSelected);
-        slotUIs.Add(slotUI);
-    }
-
-    private void OnSlotSelected(int slotIndex)
-    {
-        selectedSlotIndex = slotIndex;
-        UpdateSelectedSlotUI();
-        UpdateButtonStates();
-    }
-
-    private void UpdateSelectedSlotUI()
-    {
-        foreach (SaveSlotUI slotUI in slotUIs)
-            slotUI.SetSelected(slotUI.SlotIndex == selectedSlotIndex);
-
-        if (selectedSlotIndex >= 0 && selectedSlotIndex < slotUIs.Count)
+        for (int i = 0; i < 3; i++)
         {
-            SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlotIndex);
-            string slotInfo = $"{slot.slotName}\n";
+            SaveSlot slot = SaveSlotManager.LoadSlot(i);
 
             if (slot.hasData)
             {
-                slotInfo +=
-                    $"Personagem: {GetCharacterLabel(slot.selectedCharacter)}\n" +
-                    $"Tutorial: {GetTutorialLabel(slot.playTutorial)}\n" +
-                    $"Dificuldade: {GetDifficultyLabel(slot.difficulty)}\n" +
-                    $"Progresso: {slot.completionPercent:F1}%\n" +
-                    $"Salvo em: {slot.lastSavedTime}";
+                slotTexts[i].text =
+                    "SLOT "
+                    + (i + 1)
+                    + "\n\n"
+                    + "Personagem: "
+                    + slot.selectedCharacter
+                    + "\n"
+                    + "Dificuldade: "
+                    + slot.difficulty
+                    + "\n"
+                    + "Progresso: "
+                    + slot.completionPercent.ToString("F1")
+                    + "%"
+                    + "\n\nClique para selecionar";
             }
             else
-                slotInfo += "Vazio";
-
-            if (selectedSlotLabel != null)
-                selectedSlotLabel.text = slotInfo;
+            {
+                slotTexts[i].text = "SLOT " + (i + 1) + "\n\nNOVO JOGO";
+            }
         }
     }
 
-    private void UpdateButtonStates()
+    private void SelecionarSlot(int index)
     {
-        SaveSlot slot = selectedSlotIndex >= 0 ? SaveSlotManager.LoadSlot(selectedSlotIndex) : null;
+        selectedSlot = index;
 
-        if (loadButton != null)
-            loadButton.interactable = slot != null && slot.hasData;
+        SaveSlot slot = SaveSlotManager.LoadSlot(index);
 
-        if (saveButton != null)
-            saveButton.interactable = selectedSlotIndex >= 0;
+        if (!slot.hasData)
+        {
+            MenuNewGameFlowController flow = FindFirstObjectByType<MenuNewGameFlowController>();
 
-        if (deleteButton != null)
-            deleteButton.interactable = slot != null && slot.hasData;
+            if (flow != null)
+            {
+                flow.SetSelectedSlot(index);
+            }
+
+            // abre tela de novo jogo
+            MenuUIController menu = FindFirstObjectByType<MenuUIController>();
+
+            if (menu != null)
+            {
+                menu.ShowNewGameOptions();
+            }
+
+            return;
+        }
+
+        AtualizarBotoes();
     }
 
-    public void OnLoadButtonClicked()
+    private void CriarNovoSave()
     {
-        if (selectedSlotIndex < 0)
+        SaveSlotManager.CreateSaveFromCurrent(selectedSlot);
+
+        AtualizarSlots();
+
+        Debug.Log("Novo save criado no Slot " + (selectedSlot + 1));
+    }
+
+    private void CarregarSave()
+    {
+        if (selectedSlot < 0)
             return;
 
-        SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlotIndex);
+        SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlot);
+
         if (!slot.hasData)
             return;
 
-        SaveSlotManager.LoadGameFromSlot(selectedSlotIndex);
-        SetStatus($"Carregado: {slot.slotName}");
+        SaveSlotManager.LoadGameFromSlot(selectedSlot);
 
-        // Carrega a cena do jogo
         SceneManager.LoadScene("SampleScene");
     }
 
-    public void OnSaveButtonClicked()
+    private void DeletarSave()
     {
-        if (selectedSlotIndex < 0)
+        if (selectedSlot < 0)
             return;
 
-        SaveSlot newSlot = SaveSlotManager.CreateSaveFromCurrent(selectedSlotIndex);
-        SetStatus($"Salvo em: {newSlot.slotName}");
-        RefreshSlots();
+        SaveSlotManager.DeleteSlot(selectedSlot);
+
+        selectedSlot = -1;
+
+        AtualizarSlots();
+
+        AtualizarBotoes();
     }
 
-    public void OnDeleteButtonClicked()
+    private void AtualizarBotoes()
     {
-        if (selectedSlotIndex < 0)
-            return;
+        bool temSaveSelecionado = false;
 
-        SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlotIndex);
-        SaveSlotManager.DeleteSlot(selectedSlotIndex);
-        SetStatus($"Deletado: {slot.slotName}");
-        RefreshSlots();
-    }
-
-    public void OnNewGameButtonClicked()
-    {
-        if (newGameFlowController == null)
+        if (selectedSlot >= 0)
         {
-            SetStatus("Fluxo de nova partida nao encontrado.");
-            return;
+            SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlot);
+
+            temSaveSelecionado = slot != null && slot.hasData;
         }
 
-        newGameFlowController.BeginFlow();
-    }
+        loadButton.interactable = temSaveSelecionado;
 
-    private void WireButtons()
-    {
-        if (hasWiredButtons)
-            return;
-
-        if (loadButton != null)
-            loadButton.onClick.AddListener(OnLoadButtonClicked);
-
-        if (saveButton != null)
-            saveButton.onClick.AddListener(OnSaveButtonClicked);
-
-        if (deleteButton != null)
-            deleteButton.onClick.AddListener(OnDeleteButtonClicked);
-
-        if (newGameButton != null)
-            newGameButton.onClick.AddListener(OnNewGameButtonClicked);
-
-        hasWiredButtons = true;
-    }
-
-    private void SetStatus(string message)
-    {
-        if (statusLabel != null)
-            statusLabel.text = message;
-    }
-
-    private static string GetCharacterLabel(PlayableCharacterId character)
-    {
-        return character switch
-        {
-            PlayableCharacterId.Warrior => "Guerreiro",
-            PlayableCharacterId.Archer => "Arqueiro",
-            PlayableCharacterId.Mage => "Mago",
-            _ => character.ToString(),
-        };
-    }
-
-    private static string GetDifficultyLabel(GameDifficulty difficulty)
-    {
-        return difficulty switch
-        {
-            GameDifficulty.Easy => "Facil",
-            GameDifficulty.Normal => "Normal",
-            GameDifficulty.Hard => "Dificil",
-            _ => difficulty.ToString(),
-        };
-    }
-
-    private static string GetTutorialLabel(bool playTutorial)
-    {
-        return playTutorial ? "Sim" : "Nao";
-    }
-}
-
-public class SaveSlotUI : MonoBehaviour
-{
-    private int slotIndex;
-    private SaveSlot saveSlot;
-    private Button selectButton;
-    private TMP_Text slotLabel;
-    private Image slotBg;
-    private Color defaultColor;
-    private Color selectedColor = new Color(0.2f, 0.6f, 1f, 0.8f);
-
-    public int SlotIndex => slotIndex;
-
-    public void Initialize(SaveSlot slot, System.Action<int> onSelected)
-    {
-        slotIndex = slot.slotIndex;
-        saveSlot = slot;
-
-        selectButton = GetComponent<Button>();
-        slotLabel = GetComponentInChildren<TMP_Text>();
-        slotBg = GetComponent<Image>();
-
-        if (slotBg != null)
-            defaultColor = slotBg.color;
-
-        RefreshUI();
-
-        if (selectButton != null)
-            selectButton.onClick.AddListener(() => onSelected?.Invoke(slotIndex));
-    }
-
-    public void SetSelected(bool isSelected)
-    {
-        if (slotBg == null)
-            return;
-
-        slotBg.color = isSelected ? selectedColor : defaultColor;
-    }
-
-    private void RefreshUI()
-    {
-        if (slotLabel == null)
-            return;
-
-        string labelText = saveSlot.slotName;
-
-        if (saveSlot.hasData)
-            labelText +=
-                $"\n{GetCharacterLabel(saveSlot.selectedCharacter)}" +
-                $"\n{GetDifficultyLabel(saveSlot.difficulty)}" +
-                $"\n{saveSlot.completionPercent:F1}%\n{saveSlot.lastSavedTime}";
-        else
-            labelText += "\nVazio";
-
-        slotLabel.text = labelText;
-    }
-
-    private static string GetCharacterLabel(PlayableCharacterId character)
-    {
-        return character switch
-        {
-            PlayableCharacterId.Warrior => "Guerreiro",
-            PlayableCharacterId.Archer => "Arqueiro",
-            PlayableCharacterId.Mage => "Mago",
-            _ => character.ToString(),
-        };
-    }
-
-    private static string GetDifficultyLabel(GameDifficulty difficulty)
-    {
-        return difficulty switch
-        {
-            GameDifficulty.Easy => "Facil",
-            GameDifficulty.Normal => "Normal",
-            GameDifficulty.Hard => "Dificil",
-            _ => difficulty.ToString(),
-        };
+        deleteButton.interactable = temSaveSelecionado;
     }
 }

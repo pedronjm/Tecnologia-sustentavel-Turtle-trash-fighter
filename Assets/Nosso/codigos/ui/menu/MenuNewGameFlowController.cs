@@ -1,30 +1,38 @@
-using System;
 using TMPro;
 using UnityEngine;
 
 public class MenuNewGameFlowController : MonoBehaviour
 {
-    [Serializable]
-    private struct CharacterOption
-    {
-        public PlayableCharacterId id;
-        public string displayName;
-    }
+    [SerializeField]
+    private MenuUIController menuUIController;
 
-    [SerializeField] private MenuUIController menuUIController;
-    [SerializeField] private TMP_Text selectedCharacterLabel;
-    [SerializeField] private TMP_Text summaryLabel;
-    [SerializeField] private TMP_Text statusLabel;
-    [SerializeField] private CharacterOption[] characterOptions =
-    {
-        new CharacterOption { id = PlayableCharacterId.Warrior, displayName = "Guerreiro" },
-        new CharacterOption { id = PlayableCharacterId.Archer, displayName = "Arqueiro" },
-        new CharacterOption { id = PlayableCharacterId.Mage, displayName = "Mago" },
-    };
+    [SerializeField]
+    private TMP_Text summaryLabel;
 
-    private int selectedCharacterIndex;
-    private bool playTutorial;
-    private GameDifficulty selectedDifficulty;
+    private int selectedSlot = -1;
+
+    [SerializeField]
+    private TMP_Text statusLabel;
+
+    private bool playTutorial = true;
+    private GameDifficulty selectedDifficulty = GameDifficulty.Normal;
+
+    [Header("Tutorial Buttons")]
+    [SerializeField]
+    private GameObject tutorialYesButton; // Botão "Sim"
+
+    [SerializeField]
+    private GameObject tutorialNoButton; // Botão "Não"
+
+    [Header("Difficult Buttons")]
+    [SerializeField]
+    private GameObject EasyButton; // Botão "faxcil"
+
+    [SerializeField]
+    private GameObject NormalButton; // Botão "Normal"
+
+    [SerializeField]
+    private GameObject HardButton; // Botão "Difícil"
 
     private void Awake()
     {
@@ -38,36 +46,15 @@ public class MenuNewGameFlowController : MonoBehaviour
     {
         SyncWithLastSelection();
         SetStatus(string.Empty);
-        RefreshCharacterLabel();
         RefreshSummary();
-        menuUIController?.ShowNewGameCharacter();
-    }
-
-    public void SelectCharacterByIndex(int index)
-    {
-        if (characterOptions == null || index < 0 || index >= characterOptions.Length)
-            return;
-
-        selectedCharacterIndex = index;
-        RefreshCharacterLabel();
-    }
-
-    public void ContinueToOptions()
-    {
-        if (characterOptions == null || characterOptions.Length == 0)
-        {
-            SetStatus("Nenhum personagem configurado.");
-            return;
-        }
-
-        RefreshSummary();
-        SetStatus(string.Empty);
         menuUIController?.ShowNewGameOptions();
     }
 
-    public void BackToCharacterSelection()
+    public void SetSelectedSlot(int slot)
     {
-        menuUIController?.ShowNewGameCharacter();
+        selectedSlot = slot;
+
+        Debug.Log("Novo jogo será salvo no Slot: " + slot);
     }
 
     public void SetPlayTutorial(bool value)
@@ -76,30 +63,68 @@ public class MenuNewGameFlowController : MonoBehaviour
         RefreshSummary();
     }
 
+    // Esse método vai ser chamado no botão "Sim"
+    public void SelectTutorialYes()
+    {
+        playTutorial = true;
+        tutorialYesButton.SetActive(false); // Esconde o "Sim"
+        tutorialNoButton.SetActive(true); // Mostra o "Não"
+        RefreshSummary();
+    }
+
+    // Esse método vai ser chamado no botão "Não"
+    public void SelectTutorialNo()
+    {
+        playTutorial = false;
+        tutorialNoButton.SetActive(false); // Esconde o "Não"
+        tutorialYesButton.SetActive(true); // Mostra o "Sim"
+        RefreshSummary();
+    }
+
     public void SetDifficultyEasy()
     {
         selectedDifficulty = GameDifficulty.Easy;
+        EasyButton.SetActive(false);
+        NormalButton.SetActive(true);
+        HardButton.SetActive(false);
         RefreshSummary();
     }
 
     public void SetDifficultyNormal()
     {
         selectedDifficulty = GameDifficulty.Normal;
+        EasyButton.SetActive(false);
+        NormalButton.SetActive(false);
+        HardButton.SetActive(true);
         RefreshSummary();
     }
 
     public void SetDifficultyHard()
     {
         selectedDifficulty = GameDifficulty.Hard;
+        EasyButton.SetActive(true);
+        NormalButton.SetActive(false);
+        HardButton.SetActive(false);
         RefreshSummary();
     }
 
     public void ConfirmAndStartGame()
     {
-        PlayableCharacterId characterId = GetSelectedCharacterId();
+        if (selectedSlot < 0)
+        {
+            Debug.Log("Nenhum slot selecionado.");
+            return;
+        }
+
+        PlayableCharacterId characterId = PlayableCharacterId.Warrior;
+
         NewGameSessionSettings.Apply(characterId, playTutorial, selectedDifficulty);
 
+        // cria o save no slot escolhido
+        SaveSlotManager.CreateSaveFromCurrent(selectedSlot);
+
         SetStatus("Iniciando partida...");
+
         menuUIController?.LoadConfiguredGameScene();
     }
 
@@ -112,55 +137,20 @@ public class MenuNewGameFlowController : MonoBehaviour
     private void SyncWithLastSelection()
     {
         NewGameSessionSettings.Load();
-
         playTutorial = NewGameSessionSettings.PlayTutorial;
         selectedDifficulty = NewGameSessionSettings.Difficulty;
-        selectedCharacterIndex = FindCharacterIndex(NewGameSessionSettings.SelectedCharacter);
 
-        if (selectedCharacterIndex < 0)
-            selectedCharacterIndex = 0;
-    }
-
-    private int FindCharacterIndex(PlayableCharacterId id)
-    {
-        if (characterOptions == null)
-            return -1;
-
-        for (int i = 0; i < characterOptions.Length; i++)
+        // Ajusta o visual inicial dos botões ao carregar
+        if (playTutorial)
         {
-            if (characterOptions[i].id == id)
-                return i;
+            tutorialYesButton.SetActive(false); // Está no "Sim", então escondemos "Sim"
+            tutorialNoButton.SetActive(true); // Mostramos o "Não"
         }
-
-        return -1;
-    }
-
-    private PlayableCharacterId GetSelectedCharacterId()
-    {
-        if (characterOptions == null || characterOptions.Length == 0)
-            return PlayableCharacterId.Warrior;
-
-        int clamped = Mathf.Clamp(selectedCharacterIndex, 0, characterOptions.Length - 1);
-        return characterOptions[clamped].id;
-    }
-
-    private void RefreshCharacterLabel()
-    {
-        if (selectedCharacterLabel == null)
-            return;
-
-        string name = GetSelectedCharacterName();
-        selectedCharacterLabel.text = $"Personagem selecionado: {name}";
-    }
-
-    private string GetSelectedCharacterName()
-    {
-        if (characterOptions == null || characterOptions.Length == 0)
-            return "Nao definido";
-
-        int clamped = Mathf.Clamp(selectedCharacterIndex, 0, characterOptions.Length - 1);
-        string displayName = characterOptions[clamped].displayName;
-        return string.IsNullOrWhiteSpace(displayName) ? characterOptions[clamped].id.ToString() : displayName;
+        else
+        {
+            tutorialYesButton.SetActive(true); // Está no "Não", então mostramos "Sim"
+            tutorialNoButton.SetActive(false); // Escondemos o "Não"
+        }
     }
 
     private void RefreshSummary()
@@ -178,7 +168,9 @@ public class MenuNewGameFlowController : MonoBehaviour
         };
 
         summaryLabel.text =
-            $"Personagem: {GetSelectedCharacterName()}\nTutorial: {tutorialText}\nDificuldade: {difficultyText}";
+            $"Personagem: Guerreiro\n"
+            + $"Tutorial: {tutorialText}\n"
+            + $"Dificuldade: {difficultyText}";
     }
 
     private void SetStatus(string message)

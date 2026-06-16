@@ -94,11 +94,14 @@ public abstract class Player : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (Time.timeScale == 0)
+            return;
+
         if (jumpResetLockTimer > 0f)
             jumpResetLockTimer -= Time.deltaTime;
 
         if (isDashing)
-            return; // Trava outros inputs durante o Dash
+            return;
 
         UpdateGroundState();
         Move();
@@ -107,7 +110,6 @@ public abstract class Player : MonoBehaviour
         WallSlide();
         CheckFall();
 
-        // As filhas vão implementar isso para decidir como atacam
         HandleCombatInput();
     }
 

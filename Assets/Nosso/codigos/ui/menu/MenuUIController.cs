@@ -4,17 +4,33 @@ using UnityEngine.SceneManagement;
 public class MenuUIController : MonoBehaviour
 {
     [Header("Panels")]
-    [SerializeField] private GameObject mainMenuPanel;
-    [SerializeField] private GameObject settingsPanel;
-    [SerializeField] private GameObject volumePanel;
-    [SerializeField] private GameObject keybindsPanel;
-    [SerializeField] private GameObject contactsPanel;
-    [SerializeField] private GameObject savesPanel;
-    [SerializeField] private GameObject newGameCharacterPanel;
-    [SerializeField] private GameObject newGameOptionsPanel;
+    [SerializeField]
+    private GameObject mainMenuPanel;
+
+    [SerializeField]
+    private GameObject settingsPanel;
+
+    [SerializeField]
+    private GameObject volumePanel;
+
+    [SerializeField]
+    private GameObject keybindsPanel;
+
+    [SerializeField]
+    private GameObject contactsPanel;
+
+    [SerializeField]
+    private GameObject savesPanel;
+
+    [SerializeField]
+    private GameObject newGameCharacterPanel;
+
+    [SerializeField]
+    private GameObject newGameOptionsPanel;
 
     [Header("Game")]
-    [SerializeField] private string gameSceneName = "SampleScene";
+    [SerializeField]
+    private string gameSceneName = "SampleScene";
 
     private void Awake()
     {
@@ -23,6 +39,8 @@ public class MenuUIController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         ShowMainMenu();
     }
+
+   
 
     public void ShowMainMenu()
     {

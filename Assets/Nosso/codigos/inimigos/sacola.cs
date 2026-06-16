@@ -52,6 +52,9 @@ public class sacola : enemy
 
     private void FixedUpdate()
     {
+        if (Time.timeScale == 0)
+            return;
+
         if (isDead || rig == null)
             return;
 
@@ -205,6 +208,9 @@ public class sacola : enemy
     // Dano ao encostar no player (Melee do Inimigo)
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (Time.timeScale == 0)
+            return;
+
         if (collision.gameObject.CompareTag("Player") && !isDead)
         {
             // Tenta usar o sistema de vida genérico (Damageable) do player
