@@ -22,6 +22,14 @@ public class MenuUIController : MonoBehaviour
     [SerializeField]
     private GameObject savesPanel;
 
+    [Header("Authentication")]
+    [SerializeField]
+    private GameObject loginPanel;
+
+    [SerializeField]
+    private GameObject registerPanel;
+
+    [Header("New Game")]
     [SerializeField]
     private GameObject newGameCharacterPanel;
 
@@ -35,12 +43,12 @@ public class MenuUIController : MonoBehaviour
     private void Awake()
     {
         MenuBindingStore.EnsureLoaded();
+
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-        ShowMainMenu();
-    }
 
-   
+        ShowLogin();
+    }
 
     public void ShowMainMenu()
     {
@@ -72,6 +80,20 @@ public class MenuUIController : MonoBehaviour
         SetOnly(savesPanel);
     }
 
+    // LOGIN
+
+    public void ShowLogin()
+    {
+        SetOnly(loginPanel);
+    }
+
+    // CADASTRO
+
+    public void ShowRegister()
+    {
+        SetOnly(registerPanel);
+    }
+
     public void StartGame()
     {
         ShowSaves();
@@ -100,12 +122,23 @@ public class MenuUIController : MonoBehaviour
     private void SetOnly(GameObject visiblePanel)
     {
         SetPanelActive(mainMenuPanel, visiblePanel == mainMenuPanel);
+
         SetPanelActive(settingsPanel, visiblePanel == settingsPanel);
+
         SetPanelActive(volumePanel, visiblePanel == volumePanel);
+
         SetPanelActive(keybindsPanel, visiblePanel == keybindsPanel);
+
         SetPanelActive(contactsPanel, visiblePanel == contactsPanel);
+
         SetPanelActive(savesPanel, visiblePanel == savesPanel);
+
+        SetPanelActive(loginPanel, visiblePanel == loginPanel);
+
+        SetPanelActive(registerPanel, visiblePanel == registerPanel);
+
         SetPanelActive(newGameCharacterPanel, visiblePanel == newGameCharacterPanel);
+
         SetPanelActive(newGameOptionsPanel, visiblePanel == newGameOptionsPanel);
     }
 

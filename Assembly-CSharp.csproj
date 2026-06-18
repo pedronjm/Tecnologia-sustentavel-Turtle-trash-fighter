@@ -52,12 +52,15 @@
     <Compile Include="Assets\Nosso\codigos\inimigos\enemy.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuKeybindsController.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\EnemyState.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\PauseMenu.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\HudColeveis.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\Maçã Pode.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\engrenagem.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuNewGameFlowController.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\Plastico.cs" />
     <Compile Include="Assets\Nosso\codigos\checkpoint\CheckpointTrigger.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuUIController.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\SaveSlotManager.cs" />
     <Compile Include="Assets\Nosso\codigos\player\PlayerMage.cs" />
     <Compile Include="Assets\Nosso\codigos\inimigos\sacola.cs" />
     <Compile Include="Assets\Nosso\codigos\combate\Projectile.cs" />
@@ -70,12 +73,13 @@
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuVolumeController.cs" />
     <Compile Include="Assets\Nosso\codigos\player\player.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuBindingStore.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\menu\MenuLoginController.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\circuito.cs" />
+    <Compile Include="Assets\Nosso\codigos\checkpoint\CheckpointData.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\Coletavel.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\PlayerHealthBar.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\garrafa.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\RemoteSaveService.cs" />
-    <Compile Include="Assets\Nosso\codigos\ui\menu\SaveSlotManager.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuHandler.cs" />
     <Compile Include="Assets\Nosso\codigos\mercado\scriptItem.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\NewGameSessionSettings.cs" />
@@ -84,9 +88,10 @@
     <Compile Include="Assets\Nosso\codigos\player\PlayerArcher.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\GameControler.cs" />
     <Compile Include="Assets\Nosso\codigos\mercado\MercadoTrigger.cs" />
+    <Compile Include="Assets\Nosso\codigos\coletaveis\Papel.cs" />
     <Compile Include="Assets\Nosso\codigos\combate\damageble.cs" />
-    <Compile Include="Assets\Nosso\codigos\ui\menu\PauseMenu.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuSavesController.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\menu\MenuRegisterController.cs" />
     <Compile Include="Assets\Nosso\codigos\player\SelectedCharacterActivator.cs" />
   </ItemGroup>
   <ItemGroup>

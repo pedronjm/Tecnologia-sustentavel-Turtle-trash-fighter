@@ -38,6 +38,12 @@ public class GameControler : MonoBehaviour
     [HideInInspector]
     public float qttcircuito;
 
+    [HideInInspector]
+    public float qttPapel;
+
+    [HideInInspector]
+    public float qttPlastico;
+
     // [HideInInspector] public float rstgarrafa;
     // [HideInInspector] public float rstengrenagem;
     // [HideInInspector] public float rstmaca;
@@ -74,16 +80,21 @@ public class GameControler : MonoBehaviour
     private int totalColetaveis;
     private int coletados;
     private bool gameOverTriggered;
+
     // Respawn / checkpoint
     [HideInInspector]
     public Vector3 lastCheckpoint;
+
     [HideInInspector]
     public bool hasCheckpoint = false;
     public float respawnDelay = 1f;
+
     [Header("Menu")]
     public string mainMenuSceneName = "menu";
+
     // referência à corrotina de respawn ativa
     private Coroutine activeRespawnCoroutine;
+
     [Header("Respawn")]
     public bool autoRespawn = false; // quando true, respawna automaticamente após death()
     public bool gameOverFullScreen = true; // quando true, o painel Gameover preencherá a tela
@@ -135,7 +146,7 @@ public class GameControler : MonoBehaviour
         // registra posição inicial como checkpoint padrão (spawn inicial)
         if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
         {
-            lastCheckpoint = CheckpointState.instance.LastCheckpointPosition;
+            lastCheckpoint = CheckpointState.instance.GetCheckpointPosition();
             hasCheckpoint = true;
         }
         else if (jogador != null)
@@ -147,7 +158,8 @@ public class GameControler : MonoBehaviour
 
     void Update()
     {
-        Damageable playerDamageable = Player.player != null ? Player.player.GetComponent<Damageable>() : null;
+        Damageable playerDamageable =
+            Player.player != null ? Player.player.GetComponent<Damageable>() : null;
         if (playerDamageable != null && playerDamageable.currentHealth <= 0)
         {
             death();
@@ -288,93 +300,95 @@ public class GameControler : MonoBehaviour
 
 
     */
-        public void ShowGameOver()
+    public void ShowGameOver()
     {
-                if (Gameover != null)
-                {
-                    // Reparent to root Canvas (if needed) and reset RectTransform so it appears centered
-                    Canvas rootCanvas = Gameover.GetComponentInParent<Canvas>();
-                    if (rootCanvas == null)
-                        rootCanvas = FindObjectOfType<Canvas>();
+        if (Gameover != null)
+        {
+            // Reparent to root Canvas (if needed) and reset RectTransform so it appears centered
+            Canvas rootCanvas = Gameover.GetComponentInParent<Canvas>();
+            if (rootCanvas == null)
+                rootCanvas = FindObjectOfType<Canvas>();
 
-                    if (rootCanvas != null)
-                        Gameover.transform.SetParent(rootCanvas.transform, false);
+            if (rootCanvas != null)
+                Gameover.transform.SetParent(rootCanvas.transform, false);
 
-                    // garante que o painel GameOver fique por cima de outros elementos do mesmo Canvas
-                    Gameover.transform.SetAsLastSibling();
+            // garante que o painel GameOver fique por cima de outros elementos do mesmo Canvas
+            Gameover.transform.SetAsLastSibling();
 
-                    // se o próprio Gameover tiver um Canvas (canvas separado), force override sorting para garantir topo
-                    Canvas goCanvas = Gameover.GetComponent<Canvas>();
-                    if (goCanvas != null)
-                    {
-                        goCanvas.overrideSorting = true;
-                        goCanvas.sortingOrder = 100; // valor alto para garantir topo
-                    }
-
-                    RectTransform rt = Gameover.GetComponent<RectTransform>();
-                    if (rt != null)
-                    {
-                        rt.localScale = Vector3.one;
-                        if (gameOverFullScreen)
-                        {
-                            // preencher toda a tela
-                            rt.pivot = new Vector2(0.5f, 0.5f);
-                            rt.anchorMin = new Vector2(0f, 0f);
-                            rt.anchorMax = new Vector2(1f, 1f);
-                            rt.offsetMin = Vector2.zero;
-                            rt.offsetMax = Vector2.zero;
-                            rt.anchoredPosition = Vector2.zero;
-                            rt.sizeDelta = Vector2.zero;
-                        }
-                        else
-                        {
-                            // centralizar sem esticar
-                            rt.pivot = new Vector2(0.5f, 0.5f);
-                            rt.anchorMin = new Vector2(0.5f, 0.5f);
-                            rt.anchorMax = new Vector2(0.5f, 0.5f);
-                            rt.anchoredPosition = Vector2.zero;
-                        }
-                    }
-
-                    Gameover.SetActive(true);
-                }
-    }
-
-
-    public void death()
-    {
-            if (gameOverTriggered)
-                return;
-
-            gameOverTriggered = true;
-            PlayPlayerDeathSound();
-        ShowGameOver();
-            if (jogador != null)
+            // se o próprio Gameover tiver um Canvas (canvas separado), force override sorting para garantir topo
+            Canvas goCanvas = Gameover.GetComponent<Canvas>();
+            if (goCanvas != null)
             {
-                // desativa jogador ao invés de destruir para permitir respawn
-                jogador.SetActive(false);
+                goCanvas.overrideSorting = true;
+                goCanvas.sortingOrder = 100; // valor alto para garantir topo
             }
 
-                // Se o painel de GameOver não estiver configurado (null), evita travamento recarregando a cena
-                if (Gameover == null)
-                {
-                    activeRespawnCoroutine = StartCoroutine(ResetSceneAfterDelay(respawnDelay));
-                    return;
-                }
-
-                // se autoRespawn estiver habilitado, inicia respawn automático; senão espera ação do jogador via botão
-            if (autoRespawn)
+            RectTransform rt = Gameover.GetComponent<RectTransform>();
+            if (rt != null)
             {
-                if (hasCheckpoint || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint()))
+                rt.localScale = Vector3.one;
+                if (gameOverFullScreen)
                 {
-                    activeRespawnCoroutine = StartCoroutine(RespawnAfterDelay(respawnDelay));
+                    // preencher toda a tela
+                    rt.pivot = new Vector2(0.5f, 0.5f);
+                    rt.anchorMin = new Vector2(0f, 0f);
+                    rt.anchorMax = new Vector2(1f, 1f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+                    rt.anchoredPosition = Vector2.zero;
+                    rt.sizeDelta = Vector2.zero;
                 }
                 else
                 {
-                    // nenhum checkpoint alcançado: recarrega a cena após pequeno delay
-                    activeRespawnCoroutine = StartCoroutine(ResetSceneAfterDelay(respawnDelay));
+                    // centralizar sem esticar
+                    rt.pivot = new Vector2(0.5f, 0.5f);
+                    rt.anchorMin = new Vector2(0.5f, 0.5f);
+                    rt.anchorMax = new Vector2(0.5f, 0.5f);
+                    rt.anchoredPosition = Vector2.zero;
                 }
             }
+
+            Gameover.SetActive(true);
+        }
+    }
+
+    public void death()
+    {
+        if (gameOverTriggered)
+            return;
+
+        gameOverTriggered = true;
+        PlayPlayerDeathSound();
+        ShowGameOver();
+        if (jogador != null)
+        {
+            // desativa jogador ao invés de destruir para permitir respawn
+            jogador.SetActive(false);
+        }
+
+        // Se o painel de GameOver não estiver configurado (null), evita travamento recarregando a cena
+        if (Gameover == null)
+        {
+            activeRespawnCoroutine = StartCoroutine(ResetSceneAfterDelay(respawnDelay));
+            return;
+        }
+
+        // se autoRespawn estiver habilitado, inicia respawn automático; senão espera ação do jogador via botão
+        if (autoRespawn)
+        {
+            if (
+                hasCheckpoint
+                || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
+            )
+            {
+                activeRespawnCoroutine = StartCoroutine(RespawnAfterDelay(respawnDelay));
+            }
+            else
+            {
+                // nenhum checkpoint alcançado: recarrega a cena após pequeno delay
+                activeRespawnCoroutine = StartCoroutine(ResetSceneAfterDelay(respawnDelay));
+            }
+        }
     }
 
     IEnumerator RespawnAfterDelay(float delay)
@@ -387,7 +401,7 @@ public class GameControler : MonoBehaviour
 
             Vector3 spawnPos = lastCheckpoint;
             if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-                spawnPos = CheckpointState.instance.LastCheckpointPosition;
+              spawnPos = CheckpointState.instance.GetCheckpointPosition();
 
             jogador.transform.position = spawnPos;
 
@@ -424,7 +438,10 @@ public class GameControler : MonoBehaviour
         }
 
         // Se houver checkpoint, faz respawn; senão recarrega cena
-        if (hasCheckpoint || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint()))
+        if (
+            hasCheckpoint
+            || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
+        )
         {
             if (jogador != null)
             {
@@ -432,8 +449,7 @@ public class GameControler : MonoBehaviour
 
                 Vector3 spawnPos = lastCheckpoint;
                 if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-                    spawnPos = CheckpointState.instance.LastCheckpointPosition;
-
+                    spawnPos = CheckpointState.instance.GetCheckpointPosition();
                 jogador.transform.position = spawnPos;
 
                 Damageable dmg = jogador.GetComponent<Damageable>();
@@ -469,7 +485,7 @@ public class GameControler : MonoBehaviour
 
         if (!string.IsNullOrEmpty(checkpointId) && CheckpointState.instance != null)
         {
-            CheckpointState.instance.SetCheckpoint(checkpointId, position);
+            CheckpointState.instance.SetCheckpoint(checkpointId);
         }
     }
     /*

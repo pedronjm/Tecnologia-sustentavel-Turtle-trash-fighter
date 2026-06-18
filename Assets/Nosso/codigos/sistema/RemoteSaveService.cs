@@ -13,18 +13,12 @@ public class RemoteSaveService : MonoBehaviour
     [Tooltip("Exemplo: http://localhost:8080")]
     public string baseUrl = "http://localhost:8080";
 
-    [Header("Auto Save")]
-    public bool autoSaveOnSceneChange;
-
-    void OnEnable()
-    {
-        if (autoSaveOnSceneChange)
-            SceneManager.sceneLoaded += OnSceneLoaded;
-    }
+  
 
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        Debug.Log("RemoteSaveService: Unsubscribed from sceneLoaded event.");
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -55,7 +49,12 @@ public class RemoteSaveService : MonoBehaviour
 
     IEnumerator RegisterRoutine(string username, string password)
     {
-        var req = new AuthRequest { login = username, password = password, nome = username };
+        var req = new AuthRequest
+        {
+            login = username,
+            password = password,
+            nome = username,
+        };
         var json = JsonUtility.ToJson(req);
 
         using var www = BuildJsonRequest("POST", "/auth/register", json, false);
@@ -63,7 +62,9 @@ public class RemoteSaveService : MonoBehaviour
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError($"Erro ao registrar: {www.responseCode} - {www.error} - {www.downloadHandler.text}");
+            Debug.LogError(
+                $"Erro ao registrar: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
+            );
             yield break;
         }
 
@@ -76,21 +77,31 @@ public class RemoteSaveService : MonoBehaviour
     IEnumerator LoginRoutine(string username, string password)
     {
         var req = new AuthRequest { login = username, password = password };
+
         var json = JsonUtility.ToJson(req);
 
+        Debug.Log("Enviando login: " + json);
+
         using var www = BuildJsonRequest("POST", "/auth/login", json, false);
+
         yield return www.SendWebRequest();
+
+        Debug.Log("Status API: " + www.responseCode);
+        Debug.Log("Resposta: " + www.downloadHandler.text);
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError($"Erro no login: {www.responseCode} - {www.error} - {www.downloadHandler.text}");
+            Debug.LogError($"Erro no login: {www.responseCode} - {www.error}");
             yield break;
         }
 
         var data = JsonUtility.FromJson<AuthResponse>(www.downloadHandler.text);
+
         EnsureSession();
+
         RemoteAuthSession.instance.SetSession(data.login, data.accessToken);
-        Debug.Log("Login concluido.");
+
+        Debug.Log("Login concluído");
     }
 
     IEnumerator SaveRoutine()
@@ -106,7 +117,9 @@ public class RemoteSaveService : MonoBehaviour
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError($"Erro ao salvar: {www.responseCode} - {www.error} - {www.downloadHandler.text}");
+            Debug.LogError(
+                $"Erro ao salvar: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
+            );
             yield break;
         }
 
@@ -118,7 +131,7 @@ public class RemoteSaveService : MonoBehaviour
         if (!ValidateAuth())
             yield break;
 
-        using var www = BuildJsonRequest("GET", "/saves/0", null, true);
+        using var www = BuildJsonRequest("GET", "/saves/1", null, true);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -129,7 +142,9 @@ public class RemoteSaveService : MonoBehaviour
                 yield break;
             }
 
-            Debug.LogError($"Erro ao carregar: {www.responseCode} - {www.error} - {www.downloadHandler.text}");
+            Debug.LogError(
+                $"Erro ao carregar: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
+            );
             yield break;
         }
 
@@ -143,8 +158,8 @@ public class RemoteSaveService : MonoBehaviour
             collectedIds = ParseStringList(response.collectedIdsJson),
             deadEnemyIds = ParseStringList(response.deadEnemyIdsJson),
             checkpointId = response.checkpointId,
-            checkpointPosition = new Vector3Data(new Vector3(response.checkpointX, response.checkpointY, response.checkpointZ)),
-            completionPercent = response.completionPercent
+
+            completionPercent = response.completionPercent,
         };
         ApplySavePayload(payload);
         Debug.Log("Load remoto concluido.");
@@ -153,24 +168,36 @@ public class RemoteSaveService : MonoBehaviour
     SavePayload BuildSavePayload()
     {
         var payload = new SavePayload();
+
+        payload.slotIndex = 1;
+
+        payload.slotName = "Save 1";
+
         payload.sceneName = SceneManager.GetActiveScene().name;
+
         payload.selectedCharacter = NewGameSessionSettings.SelectedCharacter.ToString();
+
         payload.playTutorial = NewGameSessionSettings.PlayTutorial;
+
         payload.difficulty = NewGameSessionSettings.Difficulty.ToString();
-
-        if (ColetavelState.instance != null)
-            payload.collectedIds = ColetavelState.instance.GetCollectedIds().ToList();
-
-        if (EnemyState.instance != null)
-            payload.deadEnemyIds = EnemyState.instance.GetDeadEnemyIds();
 
         if (CheckpointState.instance != null)
         {
             payload.checkpointId = CheckpointState.instance.CurrentCheckpointId;
-            payload.checkpointPosition = new Vector3Data(CheckpointState.instance.LastCheckpointPosition);
+        }
+
+        if (ColetavelState.instance != null)
+        {
+            payload.collectedIds = ColetavelState.instance.GetCollectedIds().ToList();
+        }
+
+        if (EnemyState.instance != null)
+        {
+            payload.deadEnemyIds = EnemyState.instance.GetDeadEnemyIds();
         }
 
         payload.completionPercent = CalculateCompletionPercentage();
+
         return payload;
     }
 
@@ -182,7 +209,8 @@ public class RemoteSaveService : MonoBehaviour
 
         if (GameControler.instance != null && GameControler.instance.TotalColetaveis > 0)
         {
-            collectibleRatio = (float)GameControler.instance.Coletados / GameControler.instance.TotalColetaveis;
+            collectibleRatio =
+                (float)GameControler.instance.Coletados / GameControler.instance.TotalColetaveis;
         }
 
         if (EnemyState.instance != null && EnemyState.instance.TotalEnemies > 0)
@@ -195,7 +223,8 @@ public class RemoteSaveService : MonoBehaviour
             checkpointRatio = 1f;
         }
 
-        float completion = (collectibleRatio * 0.5f + enemyRatio * 0.3f + checkpointRatio * 0.2f) * 100f;
+        float completion =
+            (collectibleRatio * 0.5f + enemyRatio * 0.3f + checkpointRatio * 0.2f) * 100f;
         return Mathf.Clamp(completion, 0f, 100f);
     }
 
@@ -203,9 +232,11 @@ public class RemoteSaveService : MonoBehaviour
     {
         EnsureStateObjects();
 
-        if (!string.IsNullOrWhiteSpace(payload.selectedCharacter) &&
-            Enum.TryParse(payload.selectedCharacter, true, out PlayableCharacterId characterId) &&
-            Enum.TryParse(payload.difficulty, true, out GameDifficulty difficulty))
+        if (
+            !string.IsNullOrWhiteSpace(payload.selectedCharacter)
+            && Enum.TryParse(payload.selectedCharacter, true, out PlayableCharacterId characterId)
+            && Enum.TryParse(payload.difficulty, true, out GameDifficulty difficulty)
+        )
         {
             NewGameSessionSettings.Apply(characterId, payload.playTutorial, difficulty);
         }
@@ -217,7 +248,7 @@ public class RemoteSaveService : MonoBehaviour
             EnemyState.instance.CarregarInimigosMortos(payload.deadEnemyIds);
 
         if (CheckpointState.instance != null)
-            CheckpointState.instance.Restaurar(payload.checkpointId, payload.checkpointPosition.ToVector3());
+            CheckpointState.instance.Restaurar(payload.checkpointId);
 
         ApplyCollectedInCurrentScene();
         EnemyState.instance?.AplicarEstadoNaCena();
@@ -228,7 +259,10 @@ public class RemoteSaveService : MonoBehaviour
         if (ColetavelState.instance == null)
             return;
 
-        var coletaveis = FindObjectsByType<Coletavel>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        var coletaveis = FindObjectsByType<Coletavel>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None
+        );
         foreach (var c in coletaveis)
         {
             if (ColetavelState.instance.FoiColetado(c.Id))
@@ -247,7 +281,10 @@ public class RemoteSaveService : MonoBehaviour
             req.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(body));
 
         if (authorized && RemoteAuthSession.instance != null)
-            req.SetRequestHeader("Authorization", $"Bearer {RemoteAuthSession.instance.AccessToken}");
+            req.SetRequestHeader(
+                "Authorization",
+                $"Bearer {RemoteAuthSession.instance.AccessToken}"
+            );
 
         return req;
     }
@@ -329,23 +366,41 @@ public class RemoteSaveService : MonoBehaviour
     }
 
     [Serializable]
-    class StringListWrapper
-    {
-        public List<string> values = new List<string>();
-    }
-
-    [Serializable]
     class SavePayload
     {
-        public string sceneName;
+        public int slotIndex = 1;
+
+        public string slotName;
+
         public string selectedCharacter;
+
         public bool playTutorial;
+
         public string difficulty;
-        public List<string> collectedIds = new List<string>();
-        public List<string> deadEnemyIds = new List<string>();
+
+        public string sceneName;
+
         public string checkpointId;
-        public Vector3Data checkpointPosition = new Vector3Data(Vector3.zero);
+
+        public List<string> collectedIds = new List<string>();
+
+        public List<string> deadEnemyIds = new List<string>();
+
         public float completionPercent;
+
+        public int qttAppleCollected;
+
+        public int qttGlassCollected;
+
+        public int qttPlasticCollected;
+
+        public int qttEletronicsCollected;
+
+        public int qttPaperCollected;
+
+        public int qttMetalCollected;
+
+        public int Score;
     }
 
     [Serializable]
@@ -366,6 +421,12 @@ public class RemoteSaveService : MonoBehaviour
         {
             return new Vector3(x, y, z);
         }
+    }
+
+    [Serializable]
+    class StringListWrapper
+    {
+        public List<string> values = new List<string>();
     }
 
     static List<string> ParseStringList(string json)

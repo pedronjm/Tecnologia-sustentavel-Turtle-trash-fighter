@@ -84,7 +84,7 @@ public static class SaveSlotManager
         if (CheckpointState.instance != null)
         {
             slot.checkpointId = CheckpointState.instance.CurrentCheckpointId;
-            slot.checkpointPosition = CheckpointState.instance.LastCheckpointPosition;
+            slot.checkpointPosition = CheckpointState.instance.GetCheckpointPosition();
             slot.hasData = CheckpointState.instance.HasCheckpoint();
         }
 
@@ -140,7 +140,7 @@ public static class SaveSlotManager
         }
 
         if (CheckpointState.instance != null)
-            CheckpointState.instance.Restaurar(slot.checkpointId, slot.checkpointPosition);
+            CheckpointState.instance.Restaurar(slot.checkpointId);
 
         NewGameSessionSettings.Apply(slot.selectedCharacter, slot.playTutorial, slot.difficulty);
 
