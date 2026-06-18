@@ -52,6 +52,7 @@
     <Compile Include="Assets\Nosso\codigos\inimigos\enemy.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuKeybindsController.cs" />
     <Compile Include="Assets\Nosso\codigos\sistema\EnemyState.cs" />
+    <Compile Include="Assets\Nosso\codigos\sistema\PauseSaveButton.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\PauseMenu.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\HudColeveis.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\Maçã Pode.cs" />

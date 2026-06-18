@@ -40,14 +40,37 @@ public class MenuUIController : MonoBehaviour
     [SerializeField]
     private string gameSceneName = "SampleScene";
 
+    private bool logado = false;
+
     private void Awake()
     {
         MenuBindingStore.EnsureLoaded();
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+    }
 
-        ShowLogin();
+    private void OnEnable()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        // Se não tem painel de login configurado, é o menu de pause — vai direto pro menu principal
+        if (loginPanel == null)
+        {
+            ShowMainMenu();
+            return;
+        }
+
+        MenuBindingStore.EnsureLoaded();
+
+        bool logado =
+            RemoteAuthSession.instance != null && RemoteAuthSession.instance.IsAuthenticated;
+
+        if (logado)
+            ShowMainMenu();
+        else
+            ShowLogin();
     }
 
     public void ShowMainMenu()

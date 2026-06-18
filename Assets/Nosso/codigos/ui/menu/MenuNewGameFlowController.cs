@@ -109,24 +109,29 @@ public class MenuNewGameFlowController : MonoBehaviour
     }
 
     public void ConfirmAndStartGame()
+{
+    if (selectedSlot < 0)
     {
-        if (selectedSlot < 0)
-        {
-            Debug.Log("Nenhum slot selecionado.");
-            return;
-        }
-
-        PlayableCharacterId characterId = PlayableCharacterId.Warrior;
-
-        NewGameSessionSettings.Apply(characterId, playTutorial, selectedDifficulty);
-
-        // cria o save no slot escolhido
-        SaveSlotManager.CreateSaveFromCurrent(selectedSlot);
-
-        SetStatus("Iniciando partida...");
-
-        menuUIController?.LoadConfiguredGameScene();
+        Debug.Log("Nenhum slot selecionado.");
+        return;
     }
+
+    PlayableCharacterId characterId = PlayableCharacterId.Warrior;
+
+    NewGameSessionSettings.Apply(characterId, playTutorial, selectedDifficulty);
+
+    // cria o save local
+    SaveSlotManager.CreateSaveFromCurrent(selectedSlot);
+
+    // cria o save remoto na API (slot 1-3)
+    var service = RemoteSaveService.getInstance();
+    if (service != null)
+        service.SaveGame(selectedSlot + 1);
+
+    SetStatus("Iniciando partida...");
+
+    menuUIController?.LoadConfiguredGameScene();
+}
 
     public void CancelFlow()
     {

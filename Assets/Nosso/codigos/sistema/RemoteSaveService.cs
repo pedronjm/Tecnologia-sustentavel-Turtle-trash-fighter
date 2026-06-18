@@ -13,7 +13,26 @@ public class RemoteSaveService : MonoBehaviour
     [Tooltip("Exemplo: http://localhost:8080")]
     public string baseUrl = "http://localhost:8080";
 
-  
+    private static RemoteSaveService instance;
+
+    public static event Action OnLoginSuccess;
+
+    private void Awake()
+    {
+        if (instance != null)
+        {
+            Destroy(gameObject); // ← só destrói, sem logar erro
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public static RemoteSaveService getInstance()
+    {
+        return instance;
+    }
 
     void OnDisable()
     {
@@ -37,10 +56,10 @@ public class RemoteSaveService : MonoBehaviour
         StartCoroutine(LoginRoutine(username, password));
     }
 
-    public void SaveGame()
-    {
-        StartCoroutine(SaveRoutine());
-    }
+   public void SaveGame(int slotIndex = 1)
+{
+    StartCoroutine(SaveRoutine(slotIndex));
+}
 
     public void LoadGame()
     {
@@ -98,19 +117,20 @@ public class RemoteSaveService : MonoBehaviour
         var data = JsonUtility.FromJson<AuthResponse>(www.downloadHandler.text);
 
         EnsureSession();
-
         RemoteAuthSession.instance.SetSession(data.login, data.accessToken);
-
         Debug.Log("Login concluído");
+        OnLoginSuccess?.Invoke();
     }
 
-    IEnumerator SaveRoutine()
-    {
-        if (!ValidateAuth())
-            yield break;
+    
+IEnumerator SaveRoutine(int slotIndex)
+{
+    if (!ValidateAuth())
+        yield break;
 
-        var payload = BuildSavePayload();
-        var json = JsonUtility.ToJson(payload);
+    var payload = BuildSavePayload(slotIndex);
+    var json = JsonUtility.ToJson(payload);
+   
 
         using var www = BuildJsonRequest("PUT", "/saves", json, true);
         yield return www.SendWebRequest();
@@ -122,6 +142,9 @@ public class RemoteSaveService : MonoBehaviour
             );
             yield break;
         }
+
+        // Sincroniza com o save local para o menu de slots
+        SaveSlotManager.CreateSaveFromCurrent(payload.slotIndex - 1);
 
         Debug.Log("Save remoto concluido.");
     }
@@ -162,10 +185,69 @@ public class RemoteSaveService : MonoBehaviour
             completionPercent = response.completionPercent,
         };
         ApplySavePayload(payload);
+
+        // Sincroniza com o save local
+        SaveSlotManager.CreateSaveFromCurrent(response.slotIndex - 1);
+
         Debug.Log("Load remoto concluido.");
     }
 
-    SavePayload BuildSavePayload()
+    public IEnumerator CarregarTodosSlots(Action onCompleto)
+    {
+        if (!ValidateAuth())
+        {
+            onCompleto?.Invoke();
+            yield break;
+        }
+
+        using var www = BuildJsonRequest("GET", "/saves", null, true);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Erro ao buscar saves: {www.responseCode} - {www.error}");
+            onCompleto?.Invoke();
+            yield break;
+        }
+
+        // JsonUtility não suporta array direto, usa wrapper
+        var wrappedJson = "{\"items\":" + www.downloadHandler.text + "}";
+        var response = JsonUtility.FromJson<SaveResponseWrapper>(wrappedJson);
+        if (response?.items != null)
+        {
+            foreach (var save in response.items)
+            {
+                var slot = new SaveSlot(save.slotIndex - 1)
+                {
+                    slotName = save.slotName,
+                    completionPercent = save.completionPercent,
+                    difficulty = Enum.TryParse(save.difficulty, true, out GameDifficulty d)
+                        ? d
+                        : GameDifficulty.Normal,
+                    selectedCharacter = Enum.TryParse(
+                        save.selectedCharacter,
+                        true,
+                        out PlayableCharacterId c
+                    )
+                        ? c
+                        : PlayableCharacterId.Warrior,
+                    hasData = true,
+                    lastSavedTime = save.lastSavedAtUtc,
+                };
+                SaveSlotManager.SaveSlot(save.slotIndex - 1, slot);
+            }
+        }
+
+        onCompleto?.Invoke();
+    }
+
+    [Serializable]
+    class SaveResponseWrapper
+    {
+        public SaveResponse[] items;
+    }
+
+    SavePayload BuildSavePayload(int slotIndex)
     {
         var payload = new SavePayload();
 
@@ -291,6 +373,11 @@ public class RemoteSaveService : MonoBehaviour
 
     bool ValidateAuth()
     {
+        Debug.Log($"Session instance: {RemoteAuthSession.instance}");
+        Debug.Log($"Token: {RemoteAuthSession.instance?.AccessToken}");
+        Debug.Log($"IsAuthenticated: {RemoteAuthSession.instance?.IsAuthenticated}");
+        Debug.Log($"Token vazio? {string.IsNullOrEmpty(RemoteAuthSession.instance?.AccessToken)}");
+
         if (RemoteAuthSession.instance == null || !RemoteAuthSession.instance.IsAuthenticated)
         {
             Debug.LogError("Usuario nao autenticado. Faca login antes de salvar/carregar.");
@@ -306,7 +393,17 @@ public class RemoteSaveService : MonoBehaviour
             return;
 
         var go = new GameObject("RemoteAuthSession");
+        DontDestroyOnLoad(go);
         go.AddComponent<RemoteAuthSession>();
+    }
+
+    void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+            Debug.LogWarning("RemoteAuthSession foi destruído!");
+        }
     }
 
     void EnsureStateObjects()
@@ -369,38 +466,22 @@ public class RemoteSaveService : MonoBehaviour
     class SavePayload
     {
         public int slotIndex = 1;
-
         public string slotName;
-
         public string selectedCharacter;
-
         public bool playTutorial;
-
         public string difficulty;
-
         public string sceneName;
-
         public string checkpointId;
-
         public List<string> collectedIds = new List<string>();
-
         public List<string> deadEnemyIds = new List<string>();
-
         public float completionPercent;
-
         public int qttAppleCollected;
-
         public int qttGlassCollected;
-
         public int qttPlasticCollected;
-
-        public int qttEletronicsCollected;
-
+        public int qttElectronicsCollected; // ← corrigido
         public int qttPaperCollected;
-
         public int qttMetalCollected;
-
-        public int Score;
+        public int score; // ← corrigido
     }
 
     [Serializable]

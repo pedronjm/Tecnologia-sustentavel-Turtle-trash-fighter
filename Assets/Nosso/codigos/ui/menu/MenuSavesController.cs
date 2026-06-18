@@ -21,25 +21,38 @@ public class MenuSavesController : MonoBehaviour
 
     private int selectedSlot = -1;
 
-    private void Start()
+    private void OnEnable()
     {
-        AtualizarSlots();
-
         loadButton.onClick.AddListener(CarregarSave);
         deleteButton.onClick.AddListener(DeletarSave);
 
         for (int i = 0; i < slotButtons.Length; i++)
         {
             int index = i;
-
-            slotButtons[i]
-                .onClick.AddListener(() =>
-                {
-                    SelecionarSlot(index);
-                });
+            slotButtons[i].onClick.AddListener(() => SelecionarSlot(index));
         }
 
         AtualizarBotoes();
+
+        // Busca saves da API antes de mostrar
+        var service = RemoteSaveService.getInstance();
+        if (service != null)
+            StartCoroutine(service.CarregarTodosSlots(OnSavesCarregados));
+        else
+            AtualizarSlots();
+    }
+
+    private void OnDisable()
+    {
+        loadButton.onClick.RemoveAllListeners();
+        deleteButton.onClick.RemoveAllListeners();
+        for (int i = 0; i < slotButtons.Length; i++)
+            slotButtons[i].onClick.RemoveAllListeners();
+    }
+
+    private void OnSavesCarregados()
+    {
+        AtualizarSlots();
     }
 
     private void AtualizarSlots()

@@ -32,4 +32,14 @@ public class RemoteAuthSession : MonoBehaviour
         Username = string.Empty;
         AccessToken = string.Empty;
     }
+
+    void EnsureSession()
+    {
+        if (RemoteAuthSession.instance != null)
+            return;
+
+        var go = new GameObject("RemoteAuthSession");
+        DontDestroyOnLoad(go); // ← adiciona isso
+        go.AddComponent<RemoteAuthSession>();
+    }
 }

@@ -3951,6 +3951,7 @@ GameObject:
   - component: {fileID: 726680254}
   - component: {fileID: 726680253}
   - component: {fileID: 726680252}
+  - component: {fileID: 726680255}
   m_Layer: 5
   m_Name: Salvar Jogo
   m_TagString: Untagged
@@ -4021,19 +4022,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 726680253}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2044274894}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &726680253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4072,6 +4061,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 726680250}
   m_CullTransparentMesh: 1
+--- !u!114 &726680255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726680250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2be8e933f0a84845b44ce8297fa9fca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseSaveButton
+  saveButton: {fileID: 726680252}
+  feedbackLabel: {fileID: 0}
 --- !u!1 &751312075
 GameObject:
   m_ObjectHideFlags: 0
@@ -4751,7 +4754,6 @@ GameObject:
   - component: {fileID: 851845165}
   - component: {fileID: 851845163}
   - component: {fileID: 851845166}
-  - component: {fileID: 851845167}
   - component: {fileID: 851845168}
   m_Layer: 0
   m_Name: GameControler
@@ -4911,19 +4913,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &851845167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 851845162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a420adea0012444ba3920fa76a35da1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CheckpointState
-  checkpoints: []
 --- !u!114 &851845168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7981,8 +7970,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1444314473}
-  - component: {fileID: 1444314472}
-  - component: {fileID: 1444314471}
   - component: {fileID: 1444314470}
   - component: {fileID: 1444314469}
   - component: {fileID: 1444314468}
@@ -8005,7 +7992,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a420adea0012444ba3920fa76a35da1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointState
-  checkpoints: []
 --- !u!114 &1444314469
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8031,31 +8017,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dbb5157ce3375c4b8dc64b5b0712525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyState
---- !u!114 &1444314471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1444314467}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2da8351fd5bd57488d144c8814c4c6c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RemoteSaveService
-  baseUrl: http://localhost:5000
---- !u!114 &1444314472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1444314467}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89dc4e918b87ca44aa620a69a2b20573, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RemoteAuthSession
 --- !u!4 &1444314473
 Transform:
   m_ObjectHideFlags: 0
@@ -9000,7 +8961,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1627081576
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11120,7 +11081,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2040991340
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11202,7 +11163,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2044274895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11326,6 +11287,8 @@ MonoBehaviour:
   keybindsPanel: {fileID: 1008409605}
   contactsPanel: {fileID: 179098057}
   savesPanel: {fileID: 0}
+  loginPanel: {fileID: 0}
+  registerPanel: {fileID: 0}
   newGameCharacterPanel: {fileID: 0}
   newGameOptionsPanel: {fileID: 0}
   gameSceneName: SampleScene

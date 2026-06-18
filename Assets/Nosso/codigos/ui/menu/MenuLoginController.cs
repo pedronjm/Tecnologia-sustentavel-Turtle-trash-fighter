@@ -19,22 +19,29 @@ public class MenuLoginController : MonoBehaviour
     [SerializeField]
     private Button loginButton;
 
-    [SerializeField]
     private RemoteSaveService remoteSaveService;
+
+    [SerializeField]
+    private MenuUIController menuUIController; // ← adiciona no header
 
     private void Awake()
     {
         remoteSaveService = FindFirstObjectByType<RemoteSaveService>();
+
+        if (remoteSaveService == null)
+            Debug.LogError("RemoteSaveService não encontrado na cena!");
     }
 
     private void OnEnable()
     {
+        RemoteSaveService.OnLoginSuccess += menuUIController.ShowMainMenu;
         if (loginButton != null)
             loginButton.onClick.AddListener(Login);
     }
 
     private void OnDisable()
     {
+        RemoteSaveService.OnLoginSuccess -= menuUIController.ShowMainMenu;
         if (loginButton != null)
             loginButton.onClick.RemoveListener(Login);
     }
