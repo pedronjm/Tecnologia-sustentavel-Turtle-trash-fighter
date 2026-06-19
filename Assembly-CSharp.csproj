@@ -76,6 +76,7 @@
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuBindingStore.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\menu\MenuLoginController.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\circuito.cs" />
+    <Compile Include="Assets\Nosso\codigos\ui\menu\CurrentSaveSession.cs" />
     <Compile Include="Assets\Nosso\codigos\checkpoint\CheckpointData.cs" />
     <Compile Include="Assets\Nosso\codigos\coletaveis\Coletavel.cs" />
     <Compile Include="Assets\Nosso\codigos\ui\PlayerHealthBar.cs" />

@@ -54,6 +54,11 @@ public class MenuNewGameFlowController : MonoBehaviour
     {
         selectedSlot = slot;
 
+        if (CurrentSaveSession.instance != null)
+        {
+            CurrentSaveSession.instance.SetSlot(slot);
+        }
+
         Debug.Log("Novo jogo será salvo no Slot: " + slot);
     }
 
@@ -109,29 +114,36 @@ public class MenuNewGameFlowController : MonoBehaviour
     }
 
     public void ConfirmAndStartGame()
-{
-    if (selectedSlot < 0)
     {
-        Debug.Log("Nenhum slot selecionado.");
-        return;
+        if (selectedSlot < 0)
+        {
+            Debug.Log("Nenhum slot selecionado.");
+            return;
+        }
+
+        PlayableCharacterId characterId = PlayableCharacterId.Warrior;
+
+        NewGameSessionSettings.Apply(characterId, playTutorial, selectedDifficulty);
+
+        // cria o save local
+        CurrentSaveSession.instance.SetSlot(selectedSlot);
+
+        var service = RemoteSaveService.getInstance();
+
+        if (service != null)
+        {
+            service.SaveGame(selectedSlot + 1);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "RemoteSaveService não encontrado. O progresso do novo jogo pode não ser salvo remotamente."
+            );
+        }
+        SetStatus("Iniciando partida...");
+
+        menuUIController?.LoadConfiguredGameScene();
     }
-
-    PlayableCharacterId characterId = PlayableCharacterId.Warrior;
-
-    NewGameSessionSettings.Apply(characterId, playTutorial, selectedDifficulty);
-
-    // cria o save local
-    SaveSlotManager.CreateSaveFromCurrent(selectedSlot);
-
-    // cria o save remoto na API (slot 1-3)
-    var service = RemoteSaveService.getInstance();
-    if (service != null)
-        service.SaveGame(selectedSlot + 1);
-
-    SetStatus("Iniciando partida...");
-
-    menuUIController?.LoadConfiguredGameScene();
-}
 
     public void CancelFlow()
     {

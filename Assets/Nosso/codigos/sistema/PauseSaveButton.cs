@@ -1,11 +1,17 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class PauseSaveButton : MonoBehaviour
 {
-    [SerializeField] private Button saveButton;
-    [SerializeField] private TMP_Text feedbackLabel; // opcional
+    [SerializeField]
+    private Button saveButton;
+
+    [SerializeField]
+    private TMP_Text feedbackLabel; // opcional
+
+    [SerializeField]
+    private int slotIndex = 0; // Índice do slot de salvamento
 
     private void OnEnable()
     {
@@ -28,12 +34,27 @@ public class PauseSaveButton : MonoBehaviour
             Debug.LogError("RemoteSaveService não encontrado!");
             return;
         }
-
-        service.SaveGame();
+        getSlotIndex();
+        service.SaveGame(slotIndex);
+      
 
         if (feedbackLabel != null)
             feedbackLabel.text = "Jogo salvo!";
 
         Debug.Log("Save solicitado pelo pause.");
+    }
+
+    private void getSlotIndex()
+    {
+        if (CurrentSaveSession.instance != null)
+        {
+            slotIndex = CurrentSaveSession.instance.SelectedSlot + 1;
+
+            Debug.Log("Slot usado no save: " + slotIndex);
+        }
+        else
+        {
+            Debug.LogError("CurrentSaveSession não encontrada!");
+        }
     }
 }

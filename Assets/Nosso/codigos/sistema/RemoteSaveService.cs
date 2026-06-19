@@ -36,14 +36,7 @@ public class RemoteSaveService : MonoBehaviour
 
     void OnDisable()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
         Debug.Log("RemoteSaveService: Unsubscribed from sceneLoaded event.");
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (RemoteAuthSession.instance != null && RemoteAuthSession.instance.IsAuthenticated)
-            SaveGame();
     }
 
     public void Register(string username, string password)
@@ -56,14 +49,14 @@ public class RemoteSaveService : MonoBehaviour
         StartCoroutine(LoginRoutine(username, password));
     }
 
-   public void SaveGame(int slotIndex = 1)
-{
-    StartCoroutine(SaveRoutine(slotIndex));
-}
-
-    public void LoadGame()
+    public void SaveGame(int slotIndex)
     {
-        StartCoroutine(LoadRoutine());
+        StartCoroutine(SaveRoutine(slotIndex));
+    }
+
+    public void LoadGame(int slotIndex)
+    {
+        StartCoroutine(LoadRoutine(slotIndex));
     }
 
     IEnumerator RegisterRoutine(string username, string password)
@@ -122,15 +115,16 @@ public class RemoteSaveService : MonoBehaviour
         OnLoginSuccess?.Invoke();
     }
 
-    
-IEnumerator SaveRoutine(int slotIndex)
-{
-    if (!ValidateAuth())
-        yield break;
+    IEnumerator SaveRoutine(int slotIndex)
+    {
+        if (!ValidateAuth())
+            yield break;
 
-    var payload = BuildSavePayload(slotIndex);
-    var json = JsonUtility.ToJson(payload);
-   
+        Debug.Log("TOKEN ATUAL: " + RemoteAuthSession.instance?.AccessToken);
+        Debug.Log("LOGIN AUTENTICADO: " + RemoteAuthSession.instance?.IsAuthenticated);
+        Debug.Log("SLOT SALVO: " + slotIndex);
+        var payload = BuildSavePayload(slotIndex);
+        var json = JsonUtility.ToJson(payload);
 
         using var www = BuildJsonRequest("PUT", "/saves", json, true);
         yield return www.SendWebRequest();
@@ -143,28 +137,25 @@ IEnumerator SaveRoutine(int slotIndex)
             yield break;
         }
 
-        // Sincroniza com o save local para o menu de slots
         SaveSlotManager.CreateSaveFromCurrent(payload.slotIndex - 1);
-
         Debug.Log("Save remoto concluido.");
     }
 
-    IEnumerator LoadRoutine()
+    IEnumerator LoadRoutine(int slotIndex)
     {
         if (!ValidateAuth())
             yield break;
 
-        using var www = BuildJsonRequest("GET", "/saves/1", null, true);
+        using var www = BuildJsonRequest("GET", $"/saves/{slotIndex}", null, true);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
         {
             if (www.responseCode == 404)
             {
-                Debug.Log("Nenhum save remoto para este usuario.");
+                Debug.Log("Nenhum save remoto para este usuario neste slot.");
                 yield break;
             }
-
             Debug.LogError(
                 $"Erro ao carregar: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
             );
@@ -181,14 +172,11 @@ IEnumerator SaveRoutine(int slotIndex)
             collectedIds = ParseStringList(response.collectedIdsJson),
             deadEnemyIds = ParseStringList(response.deadEnemyIdsJson),
             checkpointId = response.checkpointId,
-
             completionPercent = response.completionPercent,
         };
         ApplySavePayload(payload);
 
-        // Sincroniza com o save local
         SaveSlotManager.CreateSaveFromCurrent(response.slotIndex - 1);
-
         Debug.Log("Load remoto concluido.");
     }
 
@@ -251,9 +239,9 @@ IEnumerator SaveRoutine(int slotIndex)
     {
         var payload = new SavePayload();
 
-        payload.slotIndex = 1;
+        payload.slotIndex = slotIndex;
 
-        payload.slotName = "Save 1";
+        payload.slotName = "Save " + slotIndex;
 
         payload.sceneName = SceneManager.GetActiveScene().name;
 
@@ -482,6 +470,10 @@ IEnumerator SaveRoutine(int slotIndex)
         public int qttPaperCollected;
         public int qttMetalCollected;
         public int score; // ← corrigido
+
+        public int maxHealth;
+        public int currentHealth;
+        public int deathCount;
     }
 
     [Serializable]
