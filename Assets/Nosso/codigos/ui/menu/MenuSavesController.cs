@@ -144,6 +144,7 @@ public class MenuSavesController : MonoBehaviour
             menu.ShowNewGameOptions();
     }
 
+    // aprende a mexer no git imbecil
     private void CarregarSave()
     {
         if (selectedSlot < 0)
