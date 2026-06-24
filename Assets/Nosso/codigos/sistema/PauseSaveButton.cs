@@ -36,7 +36,6 @@ public class PauseSaveButton : MonoBehaviour
         }
         getSlotIndex();
         service.SaveGame(slotIndex);
-      
 
         if (feedbackLabel != null)
             feedbackLabel.text = "Jogo salvo!";
@@ -48,9 +47,14 @@ public class PauseSaveButton : MonoBehaviour
     {
         if (CurrentSaveSession.instance != null)
         {
+            Debug.Log(
+                "Slot salvo na sessão antes da conversão: "
+                    + CurrentSaveSession.instance.SelectedSlot
+            );
+
             slotIndex = CurrentSaveSession.instance.SelectedSlot + 1;
 
-            Debug.Log("Slot usado no save: " + slotIndex);
+            Debug.Log("Slot enviado para API: " + slotIndex);
         }
         else
         {

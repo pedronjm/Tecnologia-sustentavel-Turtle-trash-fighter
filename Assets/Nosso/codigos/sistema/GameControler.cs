@@ -18,7 +18,9 @@ public class GameControler : MonoBehaviour
 
     // public GameObject DICAS;
     // public GameObject ganhou;
-    // public GameObject vida;
+
+    public float maxHealth;
+
     // public GameObject hudvida;
     // public GameObject inicio;
     // public GameObject notCollected;
@@ -401,7 +403,7 @@ public class GameControler : MonoBehaviour
 
             Vector3 spawnPos = lastCheckpoint;
             if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-              spawnPos = CheckpointState.instance.GetCheckpointPosition();
+                spawnPos = CheckpointState.instance.GetCheckpointPosition();
 
             jogador.transform.position = spawnPos;
 

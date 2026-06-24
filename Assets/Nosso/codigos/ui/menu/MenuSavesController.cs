@@ -6,12 +6,18 @@ using UnityEngine.UI;
 public class MenuSavesController : MonoBehaviour
 {
     [Header("Slots")]
-    [SerializeField] private Button[] slotButtons;
-    [SerializeField] private TMP_Text[] slotTexts;
+    [SerializeField]
+    private Button[] slotButtons;
+
+    [SerializeField]
+    private TMP_Text[] slotTexts;
 
     [Header("Botoes")]
-    [SerializeField] private Button loadButton;
-    [SerializeField] private Button deleteButton;
+    [SerializeField]
+    private Button loadButton;
+
+    [SerializeField]
+    private Button deleteButton;
 
     private int selectedSlot = -1;
 
@@ -50,23 +56,43 @@ public class MenuSavesController : MonoBehaviour
         AtualizarSlots();
     }
 
+    // Busca o slot no cache em memória (preenchido por RemoteSaveService.CarregarTodosSlots)
+    private RemoteSaveService.SaveSlotInfo GetSlotInfo(int index)
+    {
+        var cache = RemoteSaveService.SlotsCache;
+        if (cache == null)
+            return null;
+        return cache.Find(s => s.slotIndex == index);
+    }
+
     private void AtualizarSlots()
     {
         for (int i = 0; i < slotButtons.Length; i++)
         {
-            SaveSlot slot = SaveSlotManager.LoadSlot(i);
+            var slot = GetSlotInfo(i);
 
             // Destaca visualmente se este slot for o selecionado atual
-            string sufixoSelecao = (i == selectedSlot) ? "\n<color=yellow><b>[ SELECIONADO ]</b></color>" : "\nClique para selecionar";
+            string sufixoSelecao =
+                (i == selectedSlot)
+                    ? "\n<color=yellow><b>[ SELECIONADO ]</b></color>"
+                    : "\nClique para selecionar";
 
             if (slot != null && slot.hasData)
             {
                 slotTexts[i].text =
-                    "SLOT " + (i + 1) + "\n\n" +
-                    "Personagem: " + slot.selectedCharacter + "\n" +
-                    "Dificuldade: " + slot.difficulty + "\n" +
-                    "Progresso: " + slot.completionPercent.ToString("F1") + "%" +
-                    sufixoSelecao;
+                    "SLOT "
+                    + (i + 1)
+                    + "\n\n"
+                    + "Personagem: "
+                    + slot.selectedCharacter
+                    + "\n"
+                    + "Dificuldade: "
+                    + slot.difficulty
+                    + "\n"
+                    + "Progresso: "
+                    + slot.completionPercent.ToString("F1")
+                    + "%"
+                    + sufixoSelecao;
             }
             else
             {
@@ -77,49 +103,62 @@ public class MenuSavesController : MonoBehaviour
 
     private void SelecionarSlot(int index)
     {
-        // Se o jogador clicar no slot que já estava selecionado, podemos carregar direto! (Opcional)
-        if (selectedSlot == index)
+        Debug.Log("Clique no slot: " + index);
+
+        var slot = GetSlotInfo(index);
+
+        if (slot == null)
         {
-            SaveSlot slotExistente = SaveSlotManager.LoadSlot(index);
-            if (slotExistente != null && slotExistente.hasData)
-            {
-                CarregarSave();
-                return;
-            }
+            Debug.LogError("Slot não existe no cache");
+            return;
         }
 
+        Debug.Log("Slot encontrado: " + slot.slotIndex + " hasData=" + slot.hasData);
+
         selectedSlot = index;
-        SaveSlot slot = SaveSlotManager.LoadSlot(index);
 
-        // Se o slot estiver vazio, inicia o fluxo de Novo Jogo
-        if (slot == null || !slot.hasData)
+        if (slot.hasData)
         {
-            MenuNewGameFlowController flow = FindFirstObjectByType<MenuNewGameFlowController>();
-            if (flow != null) flow.SetSelectedSlot(index);
+            if (CurrentSaveSession.instance != null)
+            {
+                CurrentSaveSession.instance.SetSlot(index);
+            }
 
-            MenuUIController menu = FindFirstObjectByType<MenuUIController>();
-            if (menu != null) menu.ShowNewGameOptions();
-
-            // Reseta seleção já que abriu outra tela
-            selectedSlot = -1; 
+            AtualizarSlots();
             AtualizarBotoes();
             return;
         }
 
-        // Se tem dados, atualiza o texto dos slots (para mostrar o aviso de "SELECIONADO") e os botões
-        AtualizarSlots();
-        AtualizarBotoes();
+        Debug.Log("Slot vazio, criando novo jogo");
+
+        MenuNewGameFlowController flow = FindFirstObjectByType<MenuNewGameFlowController>();
+
+        if (flow != null)
+            flow.SetSelectedSlot(index);
+
+        MenuUIController menu = FindFirstObjectByType<MenuUIController>();
+
+        if (menu != null)
+            menu.ShowNewGameOptions();
     }
 
     private void CarregarSave()
     {
-        if (selectedSlot < 0) return;
+        if (selectedSlot < 0)
+            return;
 
-        SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlot);
-        if (slot == null || !slot.hasData) return;
+        var slot = GetSlotInfo(selectedSlot);
+        if (slot == null || !slot.hasData)
+            return;
 
         Debug.Log($"Carregando Slot {selectedSlot + 1}...");
-        SaveSlotManager.LoadGameFromSlot(selectedSlot);
+
+        var service = RemoteSaveService.getInstance();
+        if (service != null)
+        {
+            // Backend usa slotIndex 1-based
+            service.LoadGame(selectedSlot + 1);
+        }
 
         // Certifique-se de que "SampleScene" é o nome exato da sua cena de jogo
         SceneManager.LoadScene("SampleScene");
@@ -127,13 +166,31 @@ public class MenuSavesController : MonoBehaviour
 
     private void DeletarSave()
     {
-        if (selectedSlot < 0) return;
+        if (selectedSlot < 0)
+            return;
 
-        SaveSlotManager.DeleteSlot(selectedSlot);
-        selectedSlot = -1;
+        var service = RemoteSaveService.getInstance();
+        if (service == null)
+            return;
 
-        AtualizarSlots();
-        AtualizarBotoes();
+        int slotParaApagar = selectedSlot + 1; // backend é 1-based
+
+        StartCoroutine(
+            service.DeleteSlotRoutine(
+                slotParaApagar,
+                () =>
+                {
+                    selectedSlot = -1;
+                    StartCoroutine(
+                        service.CarregarTodosSlots(() =>
+                        {
+                            AtualizarSlots();
+                            AtualizarBotoes();
+                        })
+                    );
+                }
+            )
+        );
     }
 
     private void AtualizarBotoes()
@@ -142,12 +199,14 @@ public class MenuSavesController : MonoBehaviour
 
         if (selectedSlot >= 0)
         {
-            SaveSlot slot = SaveSlotManager.LoadSlot(selectedSlot);
+            var slot = GetSlotInfo(selectedSlot);
             temSaveSelecionado = slot != null && slot.hasData;
         }
 
         // Ativa/Desativa os botões na UI dependendo se há um save válido selecionado
-        if (loadButton != null) loadButton.interactable = temSaveSelecionado;
-        if (deleteButton != null) deleteButton.interactable = temSaveSelecionado;
+        if (loadButton != null)
+            loadButton.interactable = temSaveSelecionado;
+        if (deleteButton != null)
+            deleteButton.interactable = temSaveSelecionado;
     }
 }

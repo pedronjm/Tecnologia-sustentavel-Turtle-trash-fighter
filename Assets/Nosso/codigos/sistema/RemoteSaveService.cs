@@ -17,6 +17,25 @@ public class RemoteSaveService : MonoBehaviour
 
     public static event Action OnLoginSuccess;
 
+    // ─────────────────────────────────────────────────────────────────────
+    // Cache em memória dos slots, alimentado por CarregarTodosSlots().
+    // Substitui o antigo SaveSlotManager (PlayerPrefs / local).
+    // ─────────────────────────────────────────────────────────────────────
+    public static List<SaveSlotInfo> SlotsCache { get; private set; } = new List<SaveSlotInfo>();
+    public const int TotalSlots = 3; // mesmo limite do backend (MIN_SLOT_INDEX..MAX_SLOT_INDEX)
+
+    [Serializable]
+    public class SaveSlotInfo
+    {
+        public int slotIndex; // 0-based (slotIndex do backend - 1)
+        public string slotName;
+        public string selectedCharacter;
+        public string difficulty;
+        public float completionPercent;
+        public string lastSavedTime;
+        public bool hasData;
+    }
+
     private void Awake()
     {
         if (instance != null)
@@ -36,7 +55,26 @@ public class RemoteSaveService : MonoBehaviour
 
     void OnDisable()
     {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
         Debug.Log("RemoteSaveService: Unsubscribed from sceneLoaded event.");
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (RemoteAuthSession.instance != null && RemoteAuthSession.instance.IsAuthenticated)
+        {
+            if (CurrentSaveSession.instance != null)
+            {
+                int slot = CurrentSaveSession.instance.SelectedSlot;
+
+                Debug.Log("Salvando slot da sessão: " + slot);
+
+                if (slot >= 0)
+                {
+                    SaveGame(slot);
+                }
+            }
+        }
     }
 
     public void Register(string username, string password)
@@ -49,12 +87,12 @@ public class RemoteSaveService : MonoBehaviour
         StartCoroutine(LoginRoutine(username, password));
     }
 
-    public void SaveGame(int slotIndex)
+    public void SaveGame(int slotIndex = 1)
     {
         StartCoroutine(SaveRoutine(slotIndex));
     }
 
-    public void LoadGame(int slotIndex)
+    public void LoadGame(int slotIndex = 1)
     {
         StartCoroutine(LoadRoutine(slotIndex));
     }
@@ -120,9 +158,6 @@ public class RemoteSaveService : MonoBehaviour
         if (!ValidateAuth())
             yield break;
 
-        Debug.Log("TOKEN ATUAL: " + RemoteAuthSession.instance?.AccessToken);
-        Debug.Log("LOGIN AUTENTICADO: " + RemoteAuthSession.instance?.IsAuthenticated);
-        Debug.Log("SLOT SALVO: " + slotIndex);
         var payload = BuildSavePayload(slotIndex);
         var json = JsonUtility.ToJson(payload);
 
@@ -137,8 +172,7 @@ public class RemoteSaveService : MonoBehaviour
             yield break;
         }
 
-        SaveSlotManager.CreateSaveFromCurrent(payload.slotIndex - 1);
-        Debug.Log("Save remoto concluido.");
+        Debug.Log($"Save remoto concluido (slot {slotIndex}).");
     }
 
     IEnumerator LoadRoutine(int slotIndex)
@@ -156,6 +190,7 @@ public class RemoteSaveService : MonoBehaviour
                 Debug.Log("Nenhum save remoto para este usuario neste slot.");
                 yield break;
             }
+
             Debug.LogError(
                 $"Erro ao carregar: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
             );
@@ -172,12 +207,37 @@ public class RemoteSaveService : MonoBehaviour
             collectedIds = ParseStringList(response.collectedIdsJson),
             deadEnemyIds = ParseStringList(response.deadEnemyIdsJson),
             checkpointId = response.checkpointId,
+
             completionPercent = response.completionPercent,
         };
         ApplySavePayload(payload);
 
-        SaveSlotManager.CreateSaveFromCurrent(response.slotIndex - 1);
-        Debug.Log("Load remoto concluido.");
+        Debug.Log($"Load remoto concluido (slot {slotIndex}).");
+    }
+
+    public IEnumerator DeleteSlotRoutine(int slotIndex, Action onCompleto = null)
+    {
+        if (!ValidateAuth())
+        {
+            onCompleto?.Invoke();
+            yield break;
+        }
+
+        using var www = BuildJsonRequest("DELETE", $"/saves/{slotIndex}", null, true);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError(
+                $"Erro ao deletar save: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
+            );
+        }
+        else
+        {
+            Debug.Log($"Save remoto deletado (slot {slotIndex}).");
+        }
+
+        onCompleto?.Invoke();
     }
 
     public IEnumerator CarregarTodosSlots(Action onCompleto)
@@ -201,31 +261,34 @@ public class RemoteSaveService : MonoBehaviour
         // JsonUtility não suporta array direto, usa wrapper
         var wrappedJson = "{\"items\":" + www.downloadHandler.text + "}";
         var response = JsonUtility.FromJson<SaveResponseWrapper>(wrappedJson);
+
+        // Recria o cache do zero a cada busca (slots fixos: 0..TotalSlots-1)
+        var novoCache = new List<SaveSlotInfo>();
+        for (int i = 0; i < TotalSlots; i++)
+            novoCache.Add(new SaveSlotInfo { slotIndex = i, hasData = false });
+
         if (response?.items != null)
         {
             foreach (var save in response.items)
             {
-                var slot = new SaveSlot(save.slotIndex - 1)
+                int idx = save.slotIndex - 1; // backend é 1-based, cache é 0-based
+                if (idx < 0 || idx >= novoCache.Count)
+                    continue;
+
+                novoCache[idx] = new SaveSlotInfo
                 {
+                    slotIndex = idx,
                     slotName = save.slotName,
+                    selectedCharacter = save.selectedCharacter,
+                    difficulty = save.difficulty,
                     completionPercent = save.completionPercent,
-                    difficulty = Enum.TryParse(save.difficulty, true, out GameDifficulty d)
-                        ? d
-                        : GameDifficulty.Normal,
-                    selectedCharacter = Enum.TryParse(
-                        save.selectedCharacter,
-                        true,
-                        out PlayableCharacterId c
-                    )
-                        ? c
-                        : PlayableCharacterId.Warrior,
-                    hasData = true,
                     lastSavedTime = save.lastSavedAtUtc,
+                    hasData = true,
                 };
-                SaveSlotManager.SaveSlot(save.slotIndex - 1, slot);
             }
         }
 
+        SlotsCache = novoCache;
         onCompleto?.Invoke();
     }
 
@@ -267,6 +330,16 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         payload.completionPercent = CalculateCompletionPercentage();
+        if (GameControler.instance != null)
+        {
+            payload.currentHealth = GameControler.instance.health;
+            payload.maxHealth = GameControler.instance.maxHealth;
+        }
+        else
+        {
+            payload.currentHealth = 100;
+            payload.maxHealth = 100;
+        }
 
         return payload;
     }
@@ -361,11 +434,6 @@ public class RemoteSaveService : MonoBehaviour
 
     bool ValidateAuth()
     {
-        Debug.Log($"Session instance: {RemoteAuthSession.instance}");
-        Debug.Log($"Token: {RemoteAuthSession.instance?.AccessToken}");
-        Debug.Log($"IsAuthenticated: {RemoteAuthSession.instance?.IsAuthenticated}");
-        Debug.Log($"Token vazio? {string.IsNullOrEmpty(RemoteAuthSession.instance?.AccessToken)}");
-
         if (RemoteAuthSession.instance == null || !RemoteAuthSession.instance.IsAuthenticated)
         {
             Debug.LogError("Usuario nao autenticado. Faca login antes de salvar/carregar.");
@@ -390,7 +458,6 @@ public class RemoteSaveService : MonoBehaviour
         if (instance == this)
         {
             instance = null;
-            Debug.LogWarning("RemoteAuthSession foi destruído!");
         }
     }
 
@@ -453,47 +520,31 @@ public class RemoteSaveService : MonoBehaviour
     [Serializable]
     class SavePayload
     {
-        public int slotIndex = 1;
+        public int slotIndex;
         public string slotName;
         public string selectedCharacter;
         public bool playTutorial;
         public string difficulty;
         public string sceneName;
         public string checkpointId;
+
         public List<string> collectedIds = new List<string>();
         public List<string> deadEnemyIds = new List<string>();
+
         public float completionPercent;
+
+        public float currentHealth;
+        public float maxHealth;
+
+        public int deathCount;
+
         public int qttAppleCollected;
         public int qttGlassCollected;
         public int qttPlasticCollected;
-        public int qttElectronicsCollected; // ← corrigido
+        public int qttElectronicsCollected;
         public int qttPaperCollected;
         public int qttMetalCollected;
-        public int score; // ← corrigido
-
-        public int maxHealth;
-        public int currentHealth;
-        public int deathCount;
-    }
-
-    [Serializable]
-    class Vector3Data
-    {
-        public float x;
-        public float y;
-        public float z;
-
-        public Vector3Data(Vector3 v)
-        {
-            x = v.x;
-            y = v.y;
-            z = v.z;
-        }
-
-        public Vector3 ToVector3()
-        {
-            return new Vector3(x, y, z);
-        }
+        public int score;
     }
 
     [Serializable]
