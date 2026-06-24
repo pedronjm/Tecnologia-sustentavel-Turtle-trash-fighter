@@ -135,6 +135,8 @@ public class MenuSavesController : MonoBehaviour
 
         if (flow != null)
             flow.SetSelectedSlot(index);
+        else
+            Debug.LogError("MenuNewGameFlowController não encontrado na cena");
 
         MenuUIController menu = FindFirstObjectByType<MenuUIController>();
 

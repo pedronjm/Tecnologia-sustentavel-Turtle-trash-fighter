@@ -911,7 +911,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &166597584
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1121,6 +1121,7 @@ GameObject:
   - component: {fileID: 194467352}
   - component: {fileID: 194467353}
   - component: {fileID: 194467354}
+  - component: {fileID: 194467355}
   m_Layer: 5
   m_Name: _Scripts
   m_TagString: Untagged
@@ -1227,6 +1228,26 @@ MonoBehaviour:
   newGameCharacterPanel: {fileID: 1697881082}
   newGameOptionsPanel: {fileID: 1896243555}
   gameSceneName: SampleScene
+--- !u!114 &194467355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194467350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2f583e82e26da94aa61b4345630533b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuNewGameFlowController
+  menuUIController: {fileID: 194467354}
+  summaryLabel: {fileID: 0}
+  statusLabel: {fileID: 0}
+  tutorialYesButton: {fileID: 921132335}
+  tutorialNoButton: {fileID: 1071461362}
+  EasyButton: {fileID: 803919792}
+  NormalButton: {fileID: 1636694846}
+  HardButton: {fileID: 1713836671}
 --- !u!1 &198777354
 GameObject:
   m_ObjectHideFlags: 0
@@ -5854,7 +5875,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
+      - m_Target: {fileID: 194467355}
         m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
         m_MethodName: SetDifficultyEasy
         m_Mode: 1
@@ -6904,7 +6925,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
+      - m_Target: {fileID: 194467355}
         m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
         m_MethodName: SelectTutorialYes
         m_Mode: 1
@@ -8237,7 +8258,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1058193961
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8620,7 +8641,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
+      - m_Target: {fileID: 194467355}
         m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
         m_MethodName: SelectTutorialNo
         m_Mode: 1
@@ -10098,7 +10119,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1268874914
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12401,7 +12422,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
+      - m_Target: {fileID: 194467355}
         m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
         m_MethodName: SetDifficultyNormal
         m_Mode: 1
@@ -12747,9 +12768,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
-        m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
-        m_MethodName: CancelFlow
+      - m_Target: {fileID: 194467354}
+        m_TargetAssemblyTypeName: MenuUIController, Assembly-CSharp
+        m_MethodName: ShowSaves
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13092,7 +13113,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
+      - m_Target: {fileID: 194467355}
         m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
         m_MethodName: SetDifficultyHard
         m_Mode: 1
@@ -13669,7 +13690,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1896243559}
+      - m_Target: {fileID: 194467355}
         m_TargetAssemblyTypeName: MenuNewGameFlowController, Assembly-CSharp
         m_MethodName: ConfirmAndStartGame
         m_Mode: 1
@@ -13809,7 +13830,6 @@ GameObject:
   - component: {fileID: 1896243556}
   - component: {fileID: 1896243558}
   - component: {fileID: 1896243557}
-  - component: {fileID: 1896243559}
   m_Layer: 5
   m_Name: NewGameOptionsPanel
   m_TagString: Untagged
@@ -13883,26 +13903,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1896243555}
   m_CullTransparentMesh: 1
---- !u!114 &1896243559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1896243555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2f583e82e26da94aa61b4345630533b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MenuNewGameFlowController
-  menuUIController: {fileID: 194467354}
-  summaryLabel: {fileID: 0}
-  statusLabel: {fileID: 0}
-  tutorialYesButton: {fileID: 921132335}
-  tutorialNoButton: {fileID: 1071461362}
-  EasyButton: {fileID: 803919792}
-  NormalButton: {fileID: 1636694846}
-  HardButton: {fileID: 1713836671}
 --- !u!1 &1897927287
 GameObject:
   m_ObjectHideFlags: 0

@@ -173,6 +173,13 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         Debug.Log($"Save remoto concluido (slot {slotIndex}).");
+
+        StartCoroutine(
+            CarregarTodosSlots(() =>
+            {
+                Debug.Log("Cache de saves atualizado");
+            })
+        );
     }
 
     IEnumerator LoadRoutine(int slotIndex)
@@ -187,32 +194,22 @@ public class RemoteSaveService : MonoBehaviour
         {
             if (www.responseCode == 404)
             {
-                Debug.Log("Nenhum save remoto para este usuario neste slot.");
+                Debug.Log("Nenhum save encontrado.");
                 yield break;
             }
 
-            Debug.LogError(
-                $"Erro ao carregar: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
-            );
+            Debug.LogError($"Erro ao carregar: {www.responseCode} - {www.error}");
+
             yield break;
         }
 
         var response = JsonUtility.FromJson<SaveResponse>(www.downloadHandler.text);
-        var payload = new SavePayload
-        {
-            sceneName = response.sceneName,
-            selectedCharacter = response.selectedCharacter,
-            playTutorial = response.playTutorial,
-            difficulty = response.difficulty,
-            collectedIds = ParseStringList(response.collectedIdsJson),
-            deadEnemyIds = ParseStringList(response.deadEnemyIdsJson),
-            checkpointId = response.checkpointId,
 
-            completionPercent = response.completionPercent,
-        };
-        ApplySavePayload(payload);
+        Debug.Log("Checkpoint recebido API: " + response.checkpointId);
 
-        Debug.Log($"Load remoto concluido (slot {slotIndex}).");
+        AplicarSave(response);
+
+        Debug.Log($"Load remoto concluído slot {slotIndex}");
     }
 
     public IEnumerator DeleteSlotRoutine(int slotIndex, Action onCompleto = null)
@@ -342,6 +339,58 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         return payload;
+    }
+
+    private void AplicarSave(SaveResponse save)
+    {
+        if (save == null)
+        {
+            Debug.LogError("Save vazio recebido");
+            return;
+        }
+
+        EnsureStateObjects();
+
+        Debug.Log("Restaurando checkpoint: " + save.checkpointId);
+
+        if (CheckpointState.instance != null)
+        {
+            CheckpointState.instance.Restaurar(save.checkpointId);
+        }
+
+        if (
+            Enum.TryParse(save.selectedCharacter, true, out PlayableCharacterId character)
+            && Enum.TryParse(save.difficulty, true, out GameDifficulty difficulty)
+        )
+        {
+            NewGameSessionSettings.Apply(character, save.playTutorial, difficulty);
+        }
+
+        if (ColetavelState.instance != null)
+        {
+            ColetavelState.instance.CarregarIds(ParseStringList(save.collectedIdsJson));
+        }
+
+        if (EnemyState.instance != null)
+        {
+            EnemyState.instance.CarregarInimigosMortos(ParseStringList(save.deadEnemyIdsJson));
+        }
+
+        if (GameControler.instance != null && CheckpointState.instance != null)
+        {
+            GameControler.instance.lastCheckpoint =
+                CheckpointState.instance.GetCheckpointPosition();
+
+            GameControler.instance.hasCheckpoint = true;
+
+            GameControler.instance.health = save.currentHealth;
+
+            GameControler.instance.maxHealth = save.maxHealth;
+        }
+
+        ApplyCollectedInCurrentScene();
+
+        EnemyState.instance?.AplicarEstadoNaCena();
     }
 
     float CalculateCompletionPercentage()
@@ -502,18 +551,45 @@ public class RemoteSaveService : MonoBehaviour
     class SaveResponse
     {
         public int slotIndex;
+
         public string slotName;
+
         public string selectedCharacter;
+
         public bool playTutorial;
+
         public string difficulty;
+
         public string sceneName;
+
         public string checkpointId;
-        public float checkpointX;
-        public float checkpointY;
-        public float checkpointZ;
+
         public string collectedIdsJson;
+
         public string deadEnemyIdsJson;
+
         public float completionPercent;
+
+        public int maxHealth;
+
+        public int currentHealth;
+
+        public int deathCount;
+
+        public int qttAppleCollected;
+
+        public int qttGlassCollected;
+
+        public int qttPlasticCollected;
+
+        public int qttElectronicsCollected;
+
+        public int qttPaperCollected;
+
+        public int qttMetalCollected;
+
+        public int score;
+
         public string lastSavedAtUtc;
     }
 
