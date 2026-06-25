@@ -145,10 +145,12 @@ public class GameControler : MonoBehaviour
         ContarColetaveisNaCena();
         AtualizarTextoRestantes();
         Gameover.SetActive(false);
+
         // registra posição inicial como checkpoint padrão (spawn inicial)
-        if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
+        if (CheckpointState.instance != null
+            && CheckpointState.instance.TryGetCheckpointPosition(out Vector3 checkpointPos))
         {
-            lastCheckpoint = CheckpointState.instance.GetCheckpointPosition();
+            lastCheckpoint = checkpointPos;
             hasCheckpoint = true;
         }
         else if (jogador != null)
@@ -378,10 +380,7 @@ public class GameControler : MonoBehaviour
         // se autoRespawn estiver habilitado, inicia respawn automático; senão espera ação do jogador via botão
         if (autoRespawn)
         {
-            if (
-                hasCheckpoint
-                || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-            )
+            if (HasAnyCheckpoint())
             {
                 activeRespawnCoroutine = StartCoroutine(RespawnAfterDelay(respawnDelay));
             }
@@ -393,6 +392,34 @@ public class GameControler : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// True se há algum ponto de respawn válido: o checkpoint remoto
+    /// (CheckpointState, com posição já registrada pela cena atual) tem
+    /// prioridade; o checkpoint local (lastCheckpoint) serve de fallback
+    /// para o spawn inicial da fase.
+    /// </summary>
+    private bool HasAnyCheckpoint()
+    {
+        return hasCheckpoint
+            || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint());
+    }
+
+    /// <summary>
+    /// Resolve a posição de respawn: prioriza o checkpoint salvo em
+    /// CheckpointState (apenas se a posição estiver de fato registrada -
+    /// ver TryGetCheckpointPosition); cai para lastCheckpoint como fallback.
+    /// </summary>
+    private Vector3 ResolveSpawnPosition()
+    {
+        if (CheckpointState.instance != null
+            && CheckpointState.instance.TryGetCheckpointPosition(out Vector3 checkpointPos))
+        {
+            return checkpointPos;
+        }
+
+        return lastCheckpoint;
+    }
+
     IEnumerator RespawnAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -400,12 +427,7 @@ public class GameControler : MonoBehaviour
         if (jogador != null)
         {
             jogador.SetActive(true);
-
-            Vector3 spawnPos = lastCheckpoint;
-            if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-                spawnPos = CheckpointState.instance.GetCheckpointPosition();
-
-            jogador.transform.position = spawnPos;
+            jogador.transform.position = ResolveSpawnPosition();
 
             Damageable dmg = jogador.GetComponent<Damageable>();
             if (dmg != null)
@@ -440,19 +462,12 @@ public class GameControler : MonoBehaviour
         }
 
         // Se houver checkpoint, faz respawn; senão recarrega cena
-        if (
-            hasCheckpoint
-            || (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-        )
+        if (HasAnyCheckpoint())
         {
             if (jogador != null)
             {
                 jogador.SetActive(true);
-
-                Vector3 spawnPos = lastCheckpoint;
-                if (CheckpointState.instance != null && CheckpointState.instance.HasCheckpoint())
-                    spawnPos = CheckpointState.instance.GetCheckpointPosition();
-                jogador.transform.position = spawnPos;
+                jogador.transform.position = ResolveSpawnPosition();
 
                 Damageable dmg = jogador.GetComponent<Damageable>();
                 if (dmg != null)

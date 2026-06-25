@@ -49,11 +49,40 @@ public class CheckpointTrigger : MonoBehaviour
 
         HidePrompt();
         HideSelectedCanvas();
+
+        // Auto-registro da posição deste checkpoint. Corrige o bug onde o
+        // respawn não encontrava a posição salva: antes ela dependia de uma
+        // lista arrastada manualmente no Inspector de um único CheckpointState
+        // (DontDestroyOnLoad), que nunca era atualizada ao trocar de cena/fase.
+        RegisterSelf();
+    }
+
+    private void OnDestroy()
+    {
+        if (CheckpointState.instance != null)
+        {
+            CheckpointState.instance.UnregisterCheckpoint(GetCheckpointId());
+        }
+    }
+
+    private void RegisterSelf()
+    {
+        if (CheckpointState.instance != null)
+        {
+            CheckpointState.instance.RegisterCheckpoint(GetCheckpointId(), transform.position);
+        }
     }
 
     private void OnEnable()
     {
         MenuBindingStore.BindingsChanged += HandleBindingsChanged;
+
+        // Repete o registro aqui como rede de segurança: a ordem de Awake()
+        // entre GameObjects distintos não é garantida pela Unity, então se
+        // CheckpointState.instance ainda não existia quando este Awake()
+        // rodou, o registro é feito agora (OnEnable roda depois de todos
+        // os Awake() da cena já terem sido chamados).
+        RegisterSelf();
     }
 
     private void OnDisable()

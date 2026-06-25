@@ -34,7 +34,8 @@ public class MenuKeybindsController : MonoBehaviour
 
     [TextArea]
     [SerializeField]
-    private string rebindPopupMessage = "Pressione uma tecla ou botão do mouse para {0}. ESC cancela.";
+    private string rebindPopupMessage =
+        "Pressione uma tecla ou botão do mouse para {0}. ESC cancela.";
 
     private int activeRowIndex = -1;
     private bool hasWiredButtons;
@@ -42,7 +43,8 @@ public class MenuKeybindsController : MonoBehaviour
     private void Awake()
     {
         Debug.Log("MenuKeybindsController.Awake()");
-        if (statusLabel != null) statusLabel.text = "MenuKeybindsController Awake";
+        if (statusLabel != null)
+            statusLabel.text = "MenuKeybindsController Awake";
         MenuBindingStore.EnsureLoaded();
         HidePopup();
         WireButtonsOnce();
@@ -51,16 +53,33 @@ public class MenuKeybindsController : MonoBehaviour
     private void Start()
     {
         Debug.Log("MenuKeybindsController.Start()");
-        if (statusLabel != null) statusLabel.text = "MenuKeybindsController Start";
+        if (statusLabel != null)
+            statusLabel.text = "MenuKeybindsController Start";
         RefreshAllLabels();
     }
 
     private void OnEnable()
     {
         Debug.Log("MenuKeybindsController.OnEnable()");
-        if (statusLabel != null) statusLabel.text = "MenuKeybindsController OnEnable";
+        if (statusLabel != null)
+            statusLabel.text = "MenuKeybindsController OnEnable";
         WireButtonsOnce();
         RefreshAllLabels();
+
+        // Toda vez que a tela abre (menu principal ou pause, é o mesmo
+        // prefab/script), busca os binds salvos no servidor. Se o jogador
+        // não estiver logado, RemoteSaveService.ValidateAuth() apenas loga
+        // o erro e a coroutine sai sem quebrar nada — fica valendo o que
+        // já está no PlayerPrefs local.
+        MenuBindingStore.BindingsChanged += OnRemoteBindingsApplied;
+        RemoteSaveService.OnSettingsLoaded += OnRemoteSettingsLoaded;
+        RemoteSaveService.getInstance()?.LoadSettings();
+    }
+
+    private void OnDisable()
+    {
+        MenuBindingStore.BindingsChanged -= OnRemoteBindingsApplied;
+        RemoteSaveService.OnSettingsLoaded -= OnRemoteSettingsLoaded;
     }
 
     private void Update()
@@ -77,6 +96,7 @@ public class MenuKeybindsController : MonoBehaviour
         activeRowIndex = -1;
         SetStatusText("Atalhos restaurados.");
         RefreshAllLabels();
+        SaveBindingsRemote();
     }
 
     private void WireButtonsOnce()
@@ -91,19 +111,27 @@ public class MenuKeybindsController : MonoBehaviour
             BindingRow row = rows[index];
 
             if (row != null && row.rebindButton != null)
-                row.rebindButton.onClick.AddListener(() => { Debug.Log($"Rebind button clicked for row {capturedIndex} ({rows[capturedIndex].action})"); BeginRebind(capturedIndex); });
+                row.rebindButton.onClick.AddListener(() =>
+                {
+                    Debug.Log(
+                        $"Rebind button clicked for row {capturedIndex} ({rows[capturedIndex].action})"
+                    );
+                    BeginRebind(capturedIndex);
+                });
         }
 
         if (resetButton != null)
         {
             resetButton.onClick.AddListener(ResetToDefaults);
             Debug.Log("Wired resetButton.onClick -> ResetToDefaults");
-            if (statusLabel != null) statusLabel.text = "Wired reset button";
+            if (statusLabel != null)
+                statusLabel.text = "Wired reset button";
         }
 
         hasWiredButtons = true;
         Debug.Log("WireButtonsOnce() finished wiring buttons");
-        if (statusLabel != null) statusLabel.text = "Wired rebind buttons";
+        if (statusLabel != null)
+            statusLabel.text = "Wired rebind buttons";
     }
 
     public void BeginRebind(int rowIndex)
@@ -135,9 +163,13 @@ public class MenuKeybindsController : MonoBehaviour
             {
                 if (keyControl != null && keyControl.wasPressedThisFrame)
                 {
-                    Debug.Log($"Key pressed captured: {keyControl.keyCode} for action {row.action}");
+                    Debug.Log(
+                        $"Key pressed captured: {keyControl.keyCode} for action {row.action}"
+                    );
                     MenuBindingStore.SetKeyboardBinding(row.action, keyControl.keyCode);
-                    FinishRebind($"{GetActionLabel(row.action)} alterado para {keyControl.keyCode}");
+                    FinishRebind(
+                        $"{GetActionLabel(row.action)} alterado para {keyControl.keyCode}"
+                    );
                     return;
                 }
             }
@@ -192,6 +224,7 @@ public class MenuKeybindsController : MonoBehaviour
         HidePopup();
         SetStatusText(message);
         RefreshAllLabels();
+        SaveBindingsRemote();
     }
 
     private void CancelRebind()
@@ -235,6 +268,32 @@ public class MenuKeybindsController : MonoBehaviour
     {
         if (rebindPopupPanel != null)
             rebindPopupPanel.SetActive(false);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Sincronização com o servidor (/settings). Mantém o jogo 100%
+    // funcional offline: se não houver login ou a requisição falhar, o
+    // RemoteSaveService só loga o erro e os binds locais (PlayerPrefs)
+    // continuam valendo normalmente.
+    // ─────────────────────────────────────────────────────────────────────
+
+    private void SaveBindingsRemote()
+    {
+        RemoteSaveService.getInstance()?.SaveSettings();
+    }
+
+    // Chamado quando o GET /settings termina e os valores já foram
+    // aplicados no MenuBindingStore (via ApplyFromRemote).
+    private void OnRemoteSettingsLoaded()
+    {
+        RefreshAllLabels();
+    }
+
+    // Chamado por qualquer mudança nos bindings (local ou remota),
+    // garante que a UI nunca fique desatualizada independente da origem.
+    private void OnRemoteBindingsApplied()
+    {
+        RefreshAllLabels();
     }
 
     private static string GetActionLabel(MenuActionId action)

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject painelPause; // Arraste o seu painel de menu aqui
-    private bool jogoPausado = false;
+    private bool jogoPausado = true;
 
     void Update()
     {

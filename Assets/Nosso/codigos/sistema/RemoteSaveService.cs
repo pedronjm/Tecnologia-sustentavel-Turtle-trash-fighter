@@ -17,6 +17,11 @@ public class RemoteSaveService : MonoBehaviour
 
     public static event Action OnLoginSuccess;
 
+    // Disparado quando GET /settings termina (sucesso ou 1a vez sem dado salvo).
+    // MenuKeybindsController pode escutar isso para atualizar a UI assim que
+    // os binds remotos chegarem, sem precisar fazer polling.
+    public static event Action OnSettingsLoaded;
+
     // ─────────────────────────────────────────────────────────────────────
     // Cache em memória dos slots, alimentado por CarregarTodosSlots().
     // Substitui o antigo SaveSlotManager (PlayerPrefs / local).
@@ -95,6 +100,106 @@ public class RemoteSaveService : MonoBehaviour
     public void LoadGame(int slotIndex = 1)
     {
         StartCoroutine(LoadRoutine(slotIndex));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Configurações (keybinds + volume). Mesmo padrão dos métodos de save:
+    // método público inicia a coroutine, que faz a chamada e aplica o
+    // resultado de volta no MenuBindingStore.
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Envia os bindings atuais (lidos do MenuBindingStore) para o servidor.
+    /// Volume é sempre enviado como 0 por enquanto (áudio ainda não implementado).
+    /// </summary>
+    public void SaveSettings()
+    {
+        StartCoroutine(SaveSettingsRoutine());
+    }
+
+    /// <summary>
+    /// Busca as configurações salvas no servidor e aplica no MenuBindingStore.
+    /// Se o jogador nunca salvou nada, o backend retorna os defaults e eles
+    /// são aplicados normalmente (não é tratado como erro).
+    /// </summary>
+    public void LoadSettings()
+    {
+        StartCoroutine(LoadSettingsRoutine());
+    }
+
+    IEnumerator SaveSettingsRoutine()
+    {
+        if (!ValidateAuth())
+            yield break;
+
+        RemoteBindingsPayload payload = MenuBindingStore.ExportForRemote();
+
+        AudioSettingsManager audioManager = AudioSettingsManager.getInstance();
+        if (audioManager != null)
+        {
+            payload.volumeGeral = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Master);
+            payload.volumeMusica = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Music);
+            payload.volumeSfx = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Sfx);
+        }
+        else
+        {
+            // Sem AudioSettingsManager na cena ainda: não sobrescreve o
+            // volume já salvo no servidor com um valor inventado.
+            Debug.LogWarning(
+                "AudioSettingsManager nao encontrado; volume nao sera enviado nesta chamada."
+            );
+            payload.volumeGeral = 0f;
+            payload.volumeMusica = 0f;
+            payload.volumeSfx = 0f;
+        }
+
+        var json = JsonUtility.ToJson(payload);
+
+        using var www = BuildJsonRequest("PUT", "/settings", json, true);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError(
+                $"Erro ao salvar configuracoes: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
+            );
+            yield break;
+        }
+
+        Debug.Log("Configuracoes salvas no servidor.");
+    }
+
+    IEnumerator LoadSettingsRoutine()
+    {
+        if (!ValidateAuth())
+            yield break;
+
+        using var www = BuildJsonRequest("GET", "/settings", null, true);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Erro ao carregar configuracoes: {www.responseCode} - {www.error}");
+            yield break;
+        }
+
+        var response = JsonUtility.FromJson<RemoteBindingsPayload>(www.downloadHandler.text);
+
+        MenuBindingStore.ApplyFromRemote(response);
+
+        AudioSettingsManager audioManager = AudioSettingsManager.getInstance();
+        if (audioManager != null)
+        {
+            audioManager.ApplyFromRemote(
+                response.volumeGeral,
+                response.volumeMusica,
+                response.volumeSfx
+            );
+        }
+
+        Debug.Log("Configuracoes carregadas do servidor.");
+
+        OnSettingsLoaded?.Invoke();
     }
 
     IEnumerator RegisterRoutine(string username, string password)

@@ -48,6 +48,9 @@ public class MenuNewGameFlowController : MonoBehaviour
         SetStatus(string.Empty);
         RefreshSummary();
         menuUIController?.ShowNewGameOptions();
+
+        SelectTutorialYes();
+        SetDifficultyNormal();
     }
 
     public void SetSelectedSlot(int slot)
@@ -142,7 +145,7 @@ public class MenuNewGameFlowController : MonoBehaviour
         }
         SetStatus("Iniciando partida...");
 
-        menuUIController?.LoadConfiguredGameScene();
+        menuUIController?.LoadConfiguredGameScene(playTutorial);
     }
 
     public void CancelFlow()

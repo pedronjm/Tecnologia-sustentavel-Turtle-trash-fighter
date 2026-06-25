@@ -44,8 +44,16 @@ public static class MenuBindingStore
         [MenuActionId.Jump] = new BindingData { isMouse = false, keyboardKey = Key.Space },
         [MenuActionId.Dash] = new BindingData { isMouse = false, keyboardKey = Key.LeftShift },
         [MenuActionId.Interact] = new BindingData { isMouse = false, keyboardKey = Key.E },
-        [MenuActionId.MeleeAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Left },
-        [MenuActionId.RangedAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Right },
+        [MenuActionId.MeleeAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Left,
+        },
+        [MenuActionId.RangedAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Right,
+        },
     };
 
     private static bool isLoaded;
@@ -79,10 +87,22 @@ public static class MenuBindingStore
         bindings[MenuActionId.MoveLeft] = new BindingData { isMouse = false, keyboardKey = Key.A };
         bindings[MenuActionId.MoveRight] = new BindingData { isMouse = false, keyboardKey = Key.D };
         bindings[MenuActionId.Jump] = new BindingData { isMouse = false, keyboardKey = Key.Space };
-        bindings[MenuActionId.Dash] = new BindingData { isMouse = false, keyboardKey = Key.LeftShift };
+        bindings[MenuActionId.Dash] = new BindingData
+        {
+            isMouse = false,
+            keyboardKey = Key.LeftShift,
+        };
         bindings[MenuActionId.Interact] = new BindingData { isMouse = false, keyboardKey = Key.E };
-        bindings[MenuActionId.MeleeAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Left };
-        bindings[MenuActionId.RangedAttack] = new BindingData { isMouse = true, mouseButton = MouseButton.Right };
+        bindings[MenuActionId.MeleeAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Left,
+        };
+        bindings[MenuActionId.RangedAttack] = new BindingData
+        {
+            isMouse = true,
+            mouseButton = MouseButton.Right,
+        };
 
         isLoaded = true;
         SaveAll();
@@ -148,7 +168,7 @@ public static class MenuBindingStore
 
     public static void SetKeyboardBinding(MenuActionId action, Key key)
     {
-        EnsureLoaded(); 
+        EnsureLoaded();
 
         BindingData currentBinding = bindings[action];
         if (!currentBinding.isMouse && currentBinding.keyboardKey == key)
@@ -180,6 +200,67 @@ public static class MenuBindingStore
         isLoaded = true;
         SaveAll();
         BindingsChanged?.Invoke();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Integração com o backend remoto (RemoteSaveService / GET-PUT /settings).
+    // Reaproveita o mesmo formato de string já usado no PlayerPrefs
+    // ("key:A" / "mouse:Left"), então nenhuma tradução extra é necessária:
+    // o que sai daqui é exatamente o que volta do servidor.
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Monta os 7 valores atuais de binding no formato esperado pelo
+    /// payload remoto (mesmas chaves usadas no DTO do backend).
+    /// </summary>
+    public static RemoteBindingsPayload ExportForRemote()
+    {
+        EnsureLoaded();
+
+        return new RemoteBindingsPayload
+        {
+            keyEsquerda = SerializeBinding(bindings[MenuActionId.MoveLeft]),
+            keyDireita = SerializeBinding(bindings[MenuActionId.MoveRight]),
+            keyDash = SerializeBinding(bindings[MenuActionId.Dash]),
+            keyInteragir = SerializeBinding(bindings[MenuActionId.Interact]),
+            keyPular = SerializeBinding(bindings[MenuActionId.Jump]),
+            keyMelee = SerializeBinding(bindings[MenuActionId.MeleeAttack]),
+            keyRanger = SerializeBinding(bindings[MenuActionId.RangedAttack]),
+        };
+    }
+
+    /// <summary>
+    /// Aplica os 7 valores recebidos do servidor (GET /settings) e
+    /// persiste localmente no PlayerPrefs, mantendo os dois em sincronia.
+    /// Valores vazios ou inválidos são ignorados (mantém o binding atual),
+    /// para não derrubar o controle do jogador por um campo nulo isolado.
+    /// </summary>
+    public static void ApplyFromRemote(RemoteBindingsPayload remote)
+    {
+        if (remote == null)
+            return;
+
+        EnsureLoaded();
+
+        TryApplyOne(MenuActionId.MoveLeft, remote.keyEsquerda);
+        TryApplyOne(MenuActionId.MoveRight, remote.keyDireita);
+        TryApplyOne(MenuActionId.Dash, remote.keyDash);
+        TryApplyOne(MenuActionId.Interact, remote.keyInteragir);
+        TryApplyOne(MenuActionId.Jump, remote.keyPular);
+        TryApplyOne(MenuActionId.MeleeAttack, remote.keyMelee);
+        TryApplyOne(MenuActionId.RangedAttack, remote.keyRanger);
+
+        isLoaded = true;
+        SaveAll();
+        BindingsChanged?.Invoke();
+    }
+
+    private static void TryApplyOne(MenuActionId action, string rawValue)
+    {
+        if (TryParseBinding(rawValue, out BindingData parsedBinding))
+        {
+            bindings[action] = parsedBinding;
+        }
     }
 
     private static MenuActionId? FindKeyboardAction(Key key)
@@ -271,4 +352,27 @@ public static class MenuBindingStore
             _ => mouseButton.ToString(),
         };
     }
+}
+
+/// <summary>
+/// Espelha o GameSettingsUpsertRequest / GameSettingsResponse do backend.
+/// Usado tanto para enviar (PUT /settings) quanto para receber (GET /settings).
+/// Os 3 campos de volume são mantidos aqui só para casar com o JSON do
+/// servidor; por enquanto são sempre enviados como 0 (áudio ainda não
+/// está implementado no jogo).
+/// </summary>
+[Serializable]
+public class RemoteBindingsPayload
+{
+    public string keyEsquerda;
+    public string keyDireita;
+    public string keyDash;
+    public string keyInteragir;
+    public string keyPular;
+    public string keyMelee;
+    public string keyRanger;
+
+    public float volumeGeral;
+    public float volumeMusica;
+    public float volumeSfx;
 }

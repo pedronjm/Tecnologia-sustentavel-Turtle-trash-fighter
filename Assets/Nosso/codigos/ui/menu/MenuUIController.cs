@@ -38,7 +38,8 @@ public class MenuUIController : MonoBehaviour
 
     [Header("Game")]
     [SerializeField]
-    private string gameSceneName = "SampleScene";
+    private string Tutorial = "SampleScene";
+    private string Nivel1 = "Nao tutorial";
 
     private bool logado = false;
 
@@ -132,9 +133,13 @@ public class MenuUIController : MonoBehaviour
         SetOnly(newGameOptionsPanel);
     }
 
-    public void LoadConfiguredGameScene()
+    public void LoadConfiguredGameScene(bool tutorial)
     {
-        SceneManager.LoadScene(gameSceneName);
+        if (tutorial)
+            SceneManager.LoadScene(Tutorial);
+        else
+            SceneManager.LoadScene(Nivel1);
+        
     }
 
     public void QuitGame()
