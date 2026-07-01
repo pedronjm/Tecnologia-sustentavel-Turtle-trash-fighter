@@ -139,7 +139,65 @@ public class MenuUIController : MonoBehaviour
             SceneManager.LoadScene(Tutorial);
         else
             SceneManager.LoadScene(Nivel1);
-        
+    }
+
+    public void Logout()
+    {
+        if (RemoteAuthSession.instance != null && RemoteAuthSession.instance.IsAuthenticated)
+        {
+            StartCoroutine(LogoutAfterSettingsSaved());
+            return;
+        }
+
+        PerformLogoutCleanup();
+    }
+
+    private System.Collections.IEnumerator LogoutAfterSettingsSaved()
+    {
+        bool settingsSaved = false;
+
+        void OnSaved()
+        {
+            settingsSaved = true;
+        }
+
+        RemoteSaveService.OnSettingsSaved += OnSaved;
+
+        try
+        {
+            RemoteSaveService.getInstance()?.SaveSettings();
+
+            float timeout = 5f;
+            while (!settingsSaved && timeout > 0f)
+            {
+                timeout -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+        }
+        finally
+        {
+            RemoteSaveService.OnSettingsSaved -= OnSaved;
+        }
+
+        PerformLogoutCleanup();
+    }
+
+    private void PerformLogoutCleanup()
+    {
+        if (RemoteAuthSession.instance != null)
+        {
+            RemoteAuthSession.instance.Logout();
+        }
+
+        if (CurrentSaveSession.instance != null)
+        {
+            CurrentSaveSession.instance.ClearSlot();
+        }
+
+        MenuBindingStore.ReloadForCurrentUser();
+        AudioSettingsManager.getInstance()?.ReloadForCurrentUser();
+
+        ShowLogin();
     }
 
     public void QuitGame()

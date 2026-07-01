@@ -44,6 +44,8 @@ public class CheckpointTrigger : MonoBehaviour
 
         checkpointData = GetComponent<CheckpointData>();
 
+        EnsureCheckpointState();
+
         AutoAssignPromptReferences();
         AutoAssignSelectedReferences();
 
@@ -67,10 +69,24 @@ public class CheckpointTrigger : MonoBehaviour
 
     private void RegisterSelf()
     {
+        EnsureCheckpointState();
+
         if (CheckpointState.instance != null)
         {
             CheckpointState.instance.RegisterCheckpoint(GetCheckpointId(), transform.position);
+            Debug.Log(
+                $"Checkpoint registrado: id={GetCheckpointId()} pos={transform.position}"
+            );
         }
+    }
+
+    private void EnsureCheckpointState()
+    {
+        if (CheckpointState.instance != null)
+            return;
+
+        var go = new GameObject("CheckpointState");
+        go.AddComponent<CheckpointState>();
     }
 
     private void OnEnable()
@@ -265,7 +281,13 @@ public class CheckpointTrigger : MonoBehaviour
 
     private void SaveCheckpoint()
     {
-        if (CheckpointState.instance != null)
+        EnsureCheckpointState();
+
+        if (GameControler.instance != null)
+        {
+            GameControler.instance.SetCheckpoint(transform.position, GetCheckpointId());
+        }
+        else if (CheckpointState.instance != null)
         {
             CheckpointState.instance.SetCheckpoint(GetCheckpointId());
         }
@@ -278,7 +300,9 @@ public class CheckpointTrigger : MonoBehaviour
 
         ShowSelectedCanvas();
 
-        Debug.Log("Checkpoint salvo: " + GetCheckpointId());
+        Debug.Log(
+            $"Checkpoint salvo: id={GetCheckpointId()} pos={transform.position} cena={gameObject.scene.name}"
+        );
     }
 
     private void HandleBindingsChanged()

@@ -57,12 +57,14 @@ public static class MenuBindingStore
     };
 
     private static bool isLoaded;
+    private static string loadedScope = string.Empty;
 
     public static event Action BindingsChanged;
 
     public static void EnsureLoaded()
     {
-        if (isLoaded)
+        string currentScope = GetScopeKey();
+        if (isLoaded && loadedScope == currentScope)
             return;
 
         Load();
@@ -70,9 +72,11 @@ public static class MenuBindingStore
 
     public static void Load()
     {
+        loadedScope = GetScopeKey();
+
         foreach (MenuActionId action in Enum.GetValues(typeof(MenuActionId)))
         {
-            string rawValue = PlayerPrefs.GetString(PrefsPrefix + action, string.Empty);
+            string rawValue = PlayerPrefs.GetString(GetPrefsKey(action), string.Empty);
             if (TryParseBinding(rawValue, out BindingData parsedBinding))
             {
                 bindings[action] = parsedBinding;
@@ -105,6 +109,7 @@ public static class MenuBindingStore
         };
 
         isLoaded = true;
+        loadedScope = GetScopeKey();
         SaveAll();
         BindingsChanged?.Invoke();
     }
@@ -122,7 +127,7 @@ public static class MenuBindingStore
     public static void SaveBinding(MenuActionId action)
     {
         EnsureLoaded();
-        PlayerPrefs.SetString(PrefsPrefix + action, SerializeBinding(bindings[action]));
+        PlayerPrefs.SetString(GetPrefsKey(action), SerializeBinding(bindings[action]));
     }
 
     public static string GetDisplayName(MenuActionId action)
@@ -180,8 +185,15 @@ public static class MenuBindingStore
 
         bindings[action] = new BindingData { isMouse = false, keyboardKey = key };
         isLoaded = true;
+        loadedScope = GetScopeKey();
         SaveAll();
         BindingsChanged?.Invoke();
+    }
+
+    public static void ReloadForCurrentUser()
+    {
+        isLoaded = false;
+        Load();
     }
 
     public static void SetMouseBinding(MenuActionId action, MouseButton mouseButton)
@@ -288,6 +300,20 @@ public static class MenuBindingStore
     private static string SerializeBinding(BindingData binding)
     {
         return binding.isMouse ? $"mouse:{binding.mouseButton}" : $"key:{binding.keyboardKey}";
+    }
+
+    private static string GetPrefsKey(MenuActionId action)
+    {
+        return PrefsPrefix + GetScopeKey() + "." + action;
+    }
+
+    private static string GetScopeKey()
+    {
+        string username = RemoteAuthSession.instance != null ? RemoteAuthSession.instance.Username : string.Empty;
+        if (string.IsNullOrWhiteSpace(username))
+            return "guest";
+
+        return username.Trim().ToLowerInvariant();
     }
 
     private static bool TryParseBinding(string rawValue, out BindingData binding)

@@ -23,4 +23,9 @@ public class CurrentSaveSession : MonoBehaviour
         SelectedSlot = slot;
         Debug.Log("Slot atual salvo na sessão: " + slot);
     }
+
+    public void ClearSlot()
+    {
+        SelectedSlot = -1;
+    }
 }

@@ -14,8 +14,12 @@ public class RemoteSaveService : MonoBehaviour
     public string baseUrl = "http://localhost:8080";
 
     private static RemoteSaveService instance;
+    private SaveResponse pendingLoadSave;
+    private string pendingLoadSceneName;
+    private int pendingSaveSlotIndex = -1;
 
     public static event Action OnLoginSuccess;
+    public static event Action OnSettingsSaved;
 
     // Disparado quando GET /settings termina (sucesso ou 1a vez sem dado salvo).
     // MenuKeybindsController pode escutar isso para atualizar a UI assim que
@@ -58,6 +62,11 @@ public class RemoteSaveService : MonoBehaviour
         return instance;
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -66,20 +75,48 @@ public class RemoteSaveService : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (RemoteAuthSession.instance != null && RemoteAuthSession.instance.IsAuthenticated)
+        if (pendingLoadSave == null)
         {
-            if (CurrentSaveSession.instance != null)
+            if (pendingSaveSlotIndex >= 0)
             {
-                int slot = CurrentSaveSession.instance.SelectedSlot;
-
-                Debug.Log("Salvando slot da sessão: " + slot);
-
-                if (slot >= 0)
-                {
-                    SaveGame(slot);
-                }
+                StartCoroutine(SaveAfterSceneLoadRoutine(pendingSaveSlotIndex));
+                pendingSaveSlotIndex = -1;
             }
+
+            return;
         }
+
+        if (!string.IsNullOrEmpty(pendingLoadSceneName) && scene.name != pendingLoadSceneName)
+            return;
+
+        StartCoroutine(ApplyPendingSaveAfterSceneLoad());
+    }
+
+    IEnumerator ApplyPendingSaveAfterSceneLoad()
+    {
+        yield return null;
+
+        if (pendingLoadSave == null)
+            yield break;
+
+        var saveToApply = pendingLoadSave;
+        ClearPendingLoad();
+
+        AplicarSave(saveToApply);
+        Debug.Log("Save aplicado após carregamento da cena.");
+    }
+
+    private void ClearPendingLoad()
+    {
+        pendingLoadSave = null;
+        pendingLoadSceneName = string.Empty;
+    }
+
+    IEnumerator SaveAfterSceneLoadRoutine(int slotIndex)
+    {
+        yield return null;
+
+        SaveGame(slotIndex);
     }
 
     public void Register(string username, string password)
@@ -95,6 +132,11 @@ public class RemoteSaveService : MonoBehaviour
     public void SaveGame(int slotIndex = 1)
     {
         StartCoroutine(SaveRoutine(slotIndex));
+    }
+
+    public void SaveGameAfterSceneLoad(int slotIndex)
+    {
+        pendingSaveSlotIndex = slotIndex;
     }
 
     public void LoadGame(int slotIndex = 1)
@@ -139,13 +181,27 @@ public class RemoteSaveService : MonoBehaviour
         if (audioManager != null)
         {
             payload.volumeGeral = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Master);
-
             payload.volumeMusica = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Music);
-
             payload.volumeSfx = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Sfx);
+        }
+        else
+        {
+            payload.volumeGeral = AudioSettingsManager.GetPersistedVolume(
+                AudioSettingsManager.VolumeChannel.Master
+            );
+            payload.volumeMusica = AudioSettingsManager.GetPersistedVolume(
+                AudioSettingsManager.VolumeChannel.Music
+            );
+            payload.volumeSfx = AudioSettingsManager.GetPersistedVolume(
+                AudioSettingsManager.VolumeChannel.Sfx
+            );
         }
 
         string json = JsonUtility.ToJson(payload);
+
+        Debug.Log(
+            $"[Settings Save] Usuario={RemoteAuthSession.instance?.Username} Master={payload.volumeGeral:0.###} Music={payload.volumeMusica:0.###} Sfx={payload.volumeSfx:0.###}"
+        );
 
         Debug.Log("ENVIO SETTINGS:");
         Debug.Log(json);
@@ -164,6 +220,7 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         Debug.Log("Config salva");
+        OnSettingsSaved?.Invoke();
     }
 
     IEnumerator LoadSettingsRoutine()
@@ -181,6 +238,11 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         var response = JsonUtility.FromJson<RemoteBindingsPayload>(www.downloadHandler.text);
+
+        Debug.Log(
+            $"[Settings Load] Usuario={RemoteAuthSession.instance?.Username} Master={response.volumeGeral:0.###} Music={response.volumeMusica:0.###} Sfx={response.volumeSfx:0.###}"
+        );
+        Debug.Log("[Settings Load] JSON recebido da API: " + www.downloadHandler.text);
 
         MenuBindingStore.ApplyFromRemote(response);
 
@@ -224,6 +286,9 @@ public class RemoteSaveService : MonoBehaviour
         EnsureSession();
         RemoteAuthSession.instance.SetSession(data.login, data.accessToken);
         Debug.Log("Registro concluido e sessao autenticada.");
+
+        MenuBindingStore.ReloadForCurrentUser();
+        AudioSettingsManager.getInstance()?.ReloadForCurrentUser();
     }
 
     IEnumerator LoginRoutine(string username, string password)
@@ -252,6 +317,9 @@ public class RemoteSaveService : MonoBehaviour
         EnsureSession();
         RemoteAuthSession.instance.SetSession(data.login, data.accessToken);
         Debug.Log("Login concluído");
+
+        MenuBindingStore.ReloadForCurrentUser();
+        AudioSettingsManager.getInstance()?.ReloadForCurrentUser();
         OnLoginSuccess?.Invoke();
     }
 
@@ -275,6 +343,7 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         Debug.Log($"Save remoto concluido (slot {slotIndex}).");
+        OnSettingsSaved?.Invoke();
 
         StartCoroutine(
             CarregarTodosSlots(() =>
@@ -309,9 +378,13 @@ public class RemoteSaveService : MonoBehaviour
 
         Debug.Log("Checkpoint recebido API: " + response.checkpointId);
 
-        AplicarSave(response);
+        pendingLoadSave = response;
+        pendingLoadSceneName = string.IsNullOrWhiteSpace(response.sceneName)
+            ? "SampleScene"
+            : response.sceneName;
 
-        Debug.Log($"Load remoto concluído slot {slotIndex}");
+        Debug.Log("Carregando cena salva: " + pendingLoadSceneName);
+        SceneManager.LoadScene(pendingLoadSceneName);
     }
 
     public IEnumerator DeleteSlotRoutine(int slotIndex, Action onCompleto = null)

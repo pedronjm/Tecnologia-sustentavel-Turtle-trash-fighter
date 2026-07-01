@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuSavesController : MonoBehaviour
@@ -162,9 +161,6 @@ public class MenuSavesController : MonoBehaviour
             // Backend usa slotIndex 1-based
             service.LoadGame(selectedSlot + 1);
         }
-
-        // Certifique-se de que "SampleScene" é o nome exato da sua cena de jogo
-        SceneManager.LoadScene("SampleScene");
     }
 
     private void DeletarSave()

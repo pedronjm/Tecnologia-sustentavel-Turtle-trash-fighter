@@ -37,34 +37,52 @@ public class MenuVolumeController : MonoBehaviour
     [SerializeField]
     private TMP_Text sfxVolumeLabel;
 
+    [Header("Acoes")]
+    [SerializeField]
+    private Button saveButton;
+
+    [SerializeField]
+    private Button loadButton;
+
+    [SerializeField]
+    private TMP_Text feedbackLabel;
+
     [Header("Sincronização remota")]
     [Tooltip("Tempo (segundos) sem mudanças no slider antes de salvar no servidor.")]
     [SerializeField]
     private float saveDebounceSeconds = 0.5f;
 
     private bool hasWiredSliders;
+    private bool hasWiredButtons;
     private bool isApplyingRemoteValues;
     private float saveCountdown = -1f;
 
     private void Awake()
     {
         WireSlidersOnce();
+        WireButtonsOnce();
     }
 
     private void OnEnable()
     {
         WireSlidersOnce();
+        WireButtonsOnce();
         RefreshSlidersFromManager();
 
         AudioSettingsManager.VolumesChanged += OnVolumesChangedExternally;
         RemoteSaveService.OnSettingsLoaded += OnRemoteSettingsLoaded;
-        RemoteSaveService.getInstance()?.LoadSettings();
+        RemoteSaveService.OnSettingsSaved += OnRemoteSettingsSaved;
+
+        if (feedbackLabel != null)
+            feedbackLabel.text =
+                "Volume local carregado. Use o botao Carregar para buscar do servidor.";
     }
 
     private void OnDisable()
     {
         AudioSettingsManager.VolumesChanged -= OnVolumesChangedExternally;
         RemoteSaveService.OnSettingsLoaded -= OnRemoteSettingsLoaded;
+        RemoteSaveService.OnSettingsSaved -= OnRemoteSettingsSaved;
 
         // Se havia um save pendente (debounce) e o menu foi fechado antes
         // dele disparar, salva agora para não perder o último ajuste.
@@ -103,6 +121,20 @@ public class MenuVolumeController : MonoBehaviour
             sfxVolumeSlider.onValueChanged.AddListener(OnSfxSliderChanged);
 
         hasWiredSliders = true;
+    }
+
+    private void WireButtonsOnce()
+    {
+        if (hasWiredButtons)
+            return;
+
+        if (saveButton != null)
+            saveButton.onClick.AddListener(SaveVolumesNow);
+
+        if (loadButton != null)
+            loadButton.onClick.AddListener(LoadVolumesFromServer);
+
+        hasWiredButtons = true;
     }
 
     private void OnMasterSliderChanged(float value)
@@ -189,7 +221,30 @@ public class MenuVolumeController : MonoBehaviour
 
     private void SaveVolumesRemote()
     {
+        Debug.Log(
+            $"[Volume UI] Clique em Salvar -> Master={AudioSettingsManager.GetPersistedVolume(AudioSettingsManager.VolumeChannel.Master):0.###} Music={AudioSettingsManager.GetPersistedVolume(AudioSettingsManager.VolumeChannel.Music):0.###} Sfx={AudioSettingsManager.GetPersistedVolume(AudioSettingsManager.VolumeChannel.Sfx):0.###}"
+        );
+        SetFeedback("Salvando volume...");
         RemoteSaveService.getInstance()?.SaveSettings();
+    }
+
+    private void SaveVolumesNow()
+    {
+        saveCountdown = -1f;
+        SaveVolumesRemote();
+    }
+
+    private void LoadVolumesFromServer()
+    {
+        Debug.Log("[Volume UI] Clique em Carregar -> requisitando volume da API.");
+        SetFeedback("Carregando volume do servidor...");
+        RemoteSaveService.getInstance()?.LoadSettings();
+    }
+
+    private void SetFeedback(string message)
+    {
+        if (feedbackLabel != null)
+            feedbackLabel.text = message;
     }
 
     // Chamado quando GET /settings termina e AudioSettingsManager já
@@ -197,6 +252,12 @@ public class MenuVolumeController : MonoBehaviour
     private void OnRemoteSettingsLoaded()
     {
         RefreshSlidersFromManager();
+        SetFeedback("Volume carregado.");
+    }
+
+    private void OnRemoteSettingsSaved()
+    {
+        SetFeedback("Volume salvo.");
     }
 
     // Chamado por qualquer mudança de volume, local ou remota, garantindo

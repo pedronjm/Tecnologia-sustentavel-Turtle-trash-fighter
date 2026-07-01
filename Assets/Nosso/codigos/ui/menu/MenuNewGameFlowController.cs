@@ -135,7 +135,7 @@ public class MenuNewGameFlowController : MonoBehaviour
 
         if (service != null)
         {
-            service.SaveGame(selectedSlot + 1);
+            service.SaveGameAfterSceneLoad(selectedSlot + 1);
         }
         else
         {

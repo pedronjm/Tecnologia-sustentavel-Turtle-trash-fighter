@@ -33,9 +33,10 @@ public class AudioSettingsManager : MonoBehaviour
     // da Unity para "totalmente mudo" sem usar -infinito.
     private const float MutedDb = -80f;
 
-    private const string PrefsPrefix = "TurtleTrashFighter.Volume.";
+    public const string PrefsPrefix = "TurtleTrashFighter.Volume.";
 
     private static AudioSettingsManager instance;
+    private string loadedScope = string.Empty;
 
     // Disparado sempre que qualquer volume muda (local ou aplicado do servidor),
     // para a UI (sliders) poder se atualizar sem precisar fazer polling.
@@ -73,12 +74,21 @@ public class AudioSettingsManager : MonoBehaviour
         return instance;
     }
 
+    public void ReloadForCurrentUser()
+    {
+        LoadLocal();
+        ApplyAllToMixer();
+        VolumesChanged?.Invoke();
+    }
+
     /// <summary>
     /// Volume linear (0-1) do canal pedido. Usado para preencher o slider
     /// na UI e para montar o payload enviado ao backend.
     /// </summary>
     public float GetVolume(VolumeChannel channel)
     {
+        EnsureLoadedForCurrentUser();
+
         return channel switch
         {
             VolumeChannel.Master => masterVolume,
@@ -95,6 +105,8 @@ public class AudioSettingsManager : MonoBehaviour
     /// </summary>
     public void SetVolume(VolumeChannel channel, float linearVolume)
     {
+        EnsureLoadedForCurrentUser();
+
         linearVolume = Mathf.Clamp01(linearVolume);
 
         switch (channel)
@@ -121,6 +133,8 @@ public class AudioSettingsManager : MonoBehaviour
     /// </summary>
     public void ApplyFromRemote(float remoteMaster, float remoteMusic, float remoteSfx)
     {
+        EnsureLoadedForCurrentUser();
+
         masterVolume = Mathf.Clamp01(remoteMaster);
         musicVolume = Mathf.Clamp01(remoteMusic);
         sfxVolume = Mathf.Clamp01(remoteSfx);
@@ -128,6 +142,17 @@ public class AudioSettingsManager : MonoBehaviour
         ApplyAllToMixer();
         SaveLocal();
         VolumesChanged?.Invoke();
+    }
+
+    public static float GetPersistedVolume(VolumeChannel channel)
+    {
+        return channel switch
+        {
+            VolumeChannel.Master => PlayerPrefs.GetFloat(GetPrefsKey("Master"), 1f),
+            VolumeChannel.Music => PlayerPrefs.GetFloat(GetPrefsKey("Music"), 1f),
+            VolumeChannel.Sfx => PlayerPrefs.GetFloat(GetPrefsKey("Sfx"), 1f),
+            _ => 1f,
+        };
     }
 
     private void ApplyAllToMixer()
@@ -167,16 +192,42 @@ public class AudioSettingsManager : MonoBehaviour
 
     private void LoadLocal()
     {
-        masterVolume = PlayerPrefs.GetFloat(PrefsPrefix + "Master", 1f);
-        musicVolume = PlayerPrefs.GetFloat(PrefsPrefix + "Music", 1f);
-        sfxVolume = PlayerPrefs.GetFloat(PrefsPrefix + "Sfx", 1f);
+        loadedScope = GetScopeKey();
+        masterVolume = PlayerPrefs.GetFloat(GetPrefsKey("Master"), 1f);
+        musicVolume = PlayerPrefs.GetFloat(GetPrefsKey("Music"), 1f);
+        sfxVolume = PlayerPrefs.GetFloat(GetPrefsKey("Sfx"), 1f);
     }
 
     private void SaveLocal()
     {
-        PlayerPrefs.SetFloat(PrefsPrefix + "Master", masterVolume);
-        PlayerPrefs.SetFloat(PrefsPrefix + "Music", musicVolume);
-        PlayerPrefs.SetFloat(PrefsPrefix + "Sfx", sfxVolume);
+        loadedScope = GetScopeKey();
+        PlayerPrefs.SetFloat(GetPrefsKey("Master"), masterVolume);
+        PlayerPrefs.SetFloat(GetPrefsKey("Music"), musicVolume);
+        PlayerPrefs.SetFloat(GetPrefsKey("Sfx"), sfxVolume);
         PlayerPrefs.Save();
+    }
+
+    private void EnsureLoadedForCurrentUser()
+    {
+        string currentScope = GetScopeKey();
+        if (loadedScope == currentScope)
+            return;
+
+        LoadLocal();
+        ApplyAllToMixer();
+    }
+
+    private static string GetPrefsKey(string suffix)
+    {
+        return PrefsPrefix + GetScopeKey() + "." + suffix;
+    }
+
+    private static string GetScopeKey()
+    {
+        string username = RemoteAuthSession.instance != null ? RemoteAuthSession.instance.Username : string.Empty;
+        if (string.IsNullOrWhiteSpace(username))
+            return "guest";
+
+        return username.Trim().ToLowerInvariant();
     }
 }
