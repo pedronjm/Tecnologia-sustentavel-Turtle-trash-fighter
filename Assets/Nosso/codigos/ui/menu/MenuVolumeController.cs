@@ -120,23 +120,28 @@ public class MenuVolumeController : MonoBehaviour
         OnSliderChanged(AudioSettingsManager.VolumeChannel.Sfx, value, sfxVolumeLabel);
     }
 
-    private void OnSliderChanged(AudioSettingsManager.VolumeChannel channel, float value, TMP_Text label)
+    private void OnSliderChanged(
+        AudioSettingsManager.VolumeChannel channel,
+        float value,
+        TMP_Text label
+    )
     {
-        // Evita loop: quando RefreshSlidersFromManager() seta slider.value
-        // programaticamente, o próprio onValueChanged dispara de novo.
         if (isApplyingRemoteValues)
             return;
 
         AudioSettingsManager manager = AudioSettingsManager.getInstance();
+
         if (manager == null)
             return;
 
         manager.SetVolume(channel, value);
+
         UpdateLabel(label, value);
 
-        // Reinicia o debounce: só salva no servidor quando o jogador
-        // parar de arrastar o slider por X segundos.
-        saveCountdown = saveDebounceSeconds;
+        if (RemoteAuthSession.instance != null && RemoteAuthSession.instance.IsAuthenticated)
+        {
+            saveCountdown = saveDebounceSeconds;
+        }
     }
 
     private void RefreshSlidersFromManager()
@@ -147,11 +152,23 @@ public class MenuVolumeController : MonoBehaviour
 
         isApplyingRemoteValues = true;
 
-        SetSliderSilently(masterVolumeSlider, manager.GetVolume(AudioSettingsManager.VolumeChannel.Master));
-        SetSliderSilently(musicVolumeSlider, manager.GetVolume(AudioSettingsManager.VolumeChannel.Music));
-        SetSliderSilently(sfxVolumeSlider, manager.GetVolume(AudioSettingsManager.VolumeChannel.Sfx));
+        SetSliderSilently(
+            masterVolumeSlider,
+            manager.GetVolume(AudioSettingsManager.VolumeChannel.Master)
+        );
+        SetSliderSilently(
+            musicVolumeSlider,
+            manager.GetVolume(AudioSettingsManager.VolumeChannel.Music)
+        );
+        SetSliderSilently(
+            sfxVolumeSlider,
+            manager.GetVolume(AudioSettingsManager.VolumeChannel.Sfx)
+        );
 
-        UpdateLabel(masterVolumeLabel, manager.GetVolume(AudioSettingsManager.VolumeChannel.Master));
+        UpdateLabel(
+            masterVolumeLabel,
+            manager.GetVolume(AudioSettingsManager.VolumeChannel.Master)
+        );
         UpdateLabel(musicVolumeLabel, manager.GetVolume(AudioSettingsManager.VolumeChannel.Music));
         UpdateLabel(sfxVolumeLabel, manager.GetVolume(AudioSettingsManager.VolumeChannel.Sfx));
 

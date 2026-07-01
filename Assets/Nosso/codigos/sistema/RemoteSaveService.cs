@@ -135,38 +135,35 @@ public class RemoteSaveService : MonoBehaviour
         RemoteBindingsPayload payload = MenuBindingStore.ExportForRemote();
 
         AudioSettingsManager audioManager = AudioSettingsManager.getInstance();
+
         if (audioManager != null)
         {
             payload.volumeGeral = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Master);
+
             payload.volumeMusica = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Music);
+
             payload.volumeSfx = audioManager.GetVolume(AudioSettingsManager.VolumeChannel.Sfx);
         }
-        else
-        {
-            // Sem AudioSettingsManager na cena ainda: não sobrescreve o
-            // volume já salvo no servidor com um valor inventado.
-            Debug.LogWarning(
-                "AudioSettingsManager nao encontrado; volume nao sera enviado nesta chamada."
-            );
-            payload.volumeGeral = 0f;
-            payload.volumeMusica = 0f;
-            payload.volumeSfx = 0f;
-        }
 
-        var json = JsonUtility.ToJson(payload);
+        string json = JsonUtility.ToJson(payload);
+
+        Debug.Log("ENVIO SETTINGS:");
+        Debug.Log(json);
 
         using var www = BuildJsonRequest("PUT", "/settings", json, true);
+
         yield return www.SendWebRequest();
+
+        Debug.Log("STATUS SETTINGS: " + www.responseCode);
+        Debug.Log(www.downloadHandler.text);
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError(
-                $"Erro ao salvar configuracoes: {www.responseCode} - {www.error} - {www.downloadHandler.text}"
-            );
+            Debug.LogError($"Erro salvar config: {www.responseCode} {www.error}");
             yield break;
         }
 
-        Debug.Log("Configuracoes salvas no servidor.");
+        Debug.Log("Config salva");
     }
 
     IEnumerator LoadSettingsRoutine()
