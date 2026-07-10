@@ -55,6 +55,16 @@ public class RemoteSaveService : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // IMPORTANTE: antes, ColetavelState/EnemyState/CheckpointState só
+        // eram criados quando um save era CARREGADO (dentro de AplicarSave).
+        // Numa partida nova, ninguém criava esses objetos, então
+        // Coletavel.cs e enemy.cs (que só fazem "if (Xstate.instance != null)")
+        // nunca registravam nada -- e o save saía vazio mesmo a requisição
+        // HTTP funcionando normalmente. Garantimos aqui que eles existem
+        // assim que o jogo inicia.
+        EnsureStateObjects();
+        Debug.Log("[RemoteSaveService] Awake: states garantidos (Coletavel/Enemy/Checkpoint).");
     }
 
     public static RemoteSaveService getInstance()
@@ -325,11 +335,20 @@ public class RemoteSaveService : MonoBehaviour
 
     IEnumerator SaveRoutine(int slotIndex)
     {
+        Debug.Log($"[Save] Iniciando SaveRoutine para o slot {slotIndex}...");
+
         if (!ValidateAuth())
             yield break;
 
+        // Rede de segurança: garante que os states existem antes de montar
+        // o payload (caso algo tenha destruído os objetos entre cenas).
+        EnsureStateObjects();
+
         var payload = BuildSavePayload(slotIndex);
         var json = JsonUtility.ToJson(payload);
+
+        Debug.Log("[Save] Payload montado, enviando para /saves:");
+        Debug.Log(json);
 
         using var www = BuildJsonRequest("PUT", "/saves", json, true);
         yield return www.SendWebRequest();
@@ -342,6 +361,8 @@ public class RemoteSaveService : MonoBehaviour
             yield break;
         }
 
+        Debug.Log($"[Save] Status HTTP: {www.responseCode}");
+        Debug.Log($"[Save] Resposta do servidor: {www.downloadHandler.text}");
         Debug.Log($"Save remoto concluido (slot {slotIndex}).");
         OnSettingsSaved?.Invoke();
 
@@ -355,17 +376,21 @@ public class RemoteSaveService : MonoBehaviour
 
     IEnumerator LoadRoutine(int slotIndex)
     {
+        Debug.Log($"[Load] Iniciando LoadRoutine para o slot {slotIndex}...");
+
         if (!ValidateAuth())
             yield break;
 
         using var www = BuildJsonRequest("GET", $"/saves/{slotIndex}", null, true);
         yield return www.SendWebRequest();
 
+        Debug.Log($"[Load] Status HTTP: {www.responseCode}");
+
         if (www.result != UnityWebRequest.Result.Success)
         {
             if (www.responseCode == 404)
             {
-                Debug.Log("Nenhum save encontrado.");
+                Debug.Log("[Load] Nenhum save encontrado para este slot.");
                 yield break;
             }
 
@@ -374,16 +399,18 @@ public class RemoteSaveService : MonoBehaviour
             yield break;
         }
 
+        Debug.Log("[Load] JSON recebido do servidor: " + www.downloadHandler.text);
+
         var response = JsonUtility.FromJson<SaveResponse>(www.downloadHandler.text);
 
-        Debug.Log("Checkpoint recebido API: " + response.checkpointId);
+        Debug.Log("[Load] Checkpoint recebido API: " + response.checkpointId);
 
         pendingLoadSave = response;
         pendingLoadSceneName = string.IsNullOrWhiteSpace(response.sceneName)
             ? "SampleScene"
             : response.sceneName;
 
-        Debug.Log("Carregando cena salva: " + pendingLoadSceneName);
+        Debug.Log("[Load] Carregando cena salva: " + pendingLoadSceneName);
         SceneManager.LoadScene(pendingLoadSceneName);
     }
 
@@ -479,6 +506,7 @@ public class RemoteSaveService : MonoBehaviour
         payload.slotName = "Save " + slotIndex;
 
         payload.sceneName = SceneManager.GetActiveScene().name;
+        Debug.Log($"[Save][BuildSavePayload] Cena atual capturada: {payload.sceneName}");
 
         payload.selectedCharacter = NewGameSessionSettings.SelectedCharacter.ToString();
 
@@ -489,16 +517,43 @@ public class RemoteSaveService : MonoBehaviour
         if (CheckpointState.instance != null)
         {
             payload.checkpointId = CheckpointState.instance.CurrentCheckpointId;
+            Debug.Log(
+                $"[Save][BuildSavePayload] CheckpointState encontrado. CurrentCheckpointId='{payload.checkpointId}'"
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[Save][BuildSavePayload] CheckpointState.instance é NULO -> checkpointId sairá vazio no save."
+            );
         }
 
         if (ColetavelState.instance != null)
         {
             payload.collectedIds = ColetavelState.instance.GetCollectedIds().ToList();
+            Debug.Log(
+                $"[Save][BuildSavePayload] ColetavelState encontrado. {payload.collectedIds.Count} itens coletados."
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[Save][BuildSavePayload] ColetavelState.instance é NULO -> collectedIds sairá vazio no save."
+            );
         }
 
         if (EnemyState.instance != null)
         {
             payload.deadEnemyIds = EnemyState.instance.GetDeadEnemyIds();
+            Debug.Log(
+                $"[Save][BuildSavePayload] EnemyState encontrado. {payload.deadEnemyIds.Count} inimigos mortos."
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[Save][BuildSavePayload] EnemyState.instance é NULO -> deadEnemyIds sairá vazio no save."
+            );
         }
 
         payload.completionPercent = CalculateCompletionPercentage();
@@ -509,28 +564,46 @@ public class RemoteSaveService : MonoBehaviour
         }
         else
         {
+            Debug.LogWarning(
+                "[Save][BuildSavePayload] GameControler.instance é NULO -> usando vida padrao (100/100)."
+            );
             payload.currentHealth = 100;
             payload.maxHealth = 100;
         }
+
+        Debug.Log(
+            $"[Save][BuildSavePayload] Payload final -> slot={payload.slotIndex} cena={payload.sceneName} "
+                + $"checkpointId='{payload.checkpointId}' coletados={payload.collectedIds.Count} "
+                + $"inimigosMortos={payload.deadEnemyIds.Count} vida={payload.currentHealth}/{payload.maxHealth} "
+                + $"completude={payload.completionPercent:0.##}%"
+        );
 
         return payload;
     }
 
     private void AplicarSave(SaveResponse save)
     {
+        Debug.Log("[Load][AplicarSave] Iniciando aplicação do save recebido do servidor...");
+
         if (save == null)
         {
-            Debug.LogError("Save vazio recebido");
+            Debug.LogError("[Load][AplicarSave] Save vazio recebido");
             return;
         }
 
         EnsureStateObjects();
 
-        Debug.Log("Restaurando checkpoint: " + save.checkpointId);
+        Debug.Log("[Load][AplicarSave] checkpointId recebido: '" + save.checkpointId + "'");
 
         if (CheckpointState.instance != null)
         {
             CheckpointState.instance.Restaurar(save.checkpointId);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[Load][AplicarSave] CheckpointState.instance nulo mesmo após EnsureStateObjects()."
+            );
         }
 
         if (
@@ -539,33 +612,62 @@ public class RemoteSaveService : MonoBehaviour
         )
         {
             NewGameSessionSettings.Apply(character, save.playTutorial, difficulty);
+            Debug.Log(
+                $"[Load][AplicarSave] Personagem/dificuldade aplicados: {character} / {difficulty}"
+            );
         }
 
         if (ColetavelState.instance != null)
         {
-            ColetavelState.instance.CarregarIds(ParseStringList(save.collectedIdsJson));
+            var collectedIds = ParseStringList(save.collectedIdsJson);
+            ColetavelState.instance.CarregarIds(collectedIds);
+            Debug.Log(
+                $"[Load][AplicarSave] {collectedIds.Count} coletáveis restaurados no ColetavelState."
+            );
         }
 
         if (EnemyState.instance != null)
         {
-            EnemyState.instance.CarregarInimigosMortos(ParseStringList(save.deadEnemyIdsJson));
+            var deadIds = ParseStringList(save.deadEnemyIdsJson);
+            EnemyState.instance.CarregarInimigosMortos(deadIds);
+            Debug.Log(
+                $"[Load][AplicarSave] {deadIds.Count} inimigos mortos restaurados no EnemyState."
+            );
         }
 
+        // ── Checkpoint: aqui é onde antes o save "não fazia nada útil" ──
+        // Antes só se atualizava GameControler.lastCheckpoint/health, sem
+        // nunca mover o jogador de fato nem tocar no Damageable real.
         if (GameControler.instance != null && CheckpointState.instance != null)
         {
-            GameControler.instance.lastCheckpoint =
-                CheckpointState.instance.GetCheckpointPosition();
+            bool posicaoValida = CheckpointState.instance.TryGetCheckpointPosition(
+                out Vector3 checkpointPos
+            );
 
-            GameControler.instance.hasCheckpoint = true;
+            Debug.Log(
+                $"[Load][AplicarSave] Posição do checkpoint '{save.checkpointId}' resolvida: "
+                    + $"valida={posicaoValida} pos={checkpointPos}"
+            );
 
-            GameControler.instance.health = save.currentHealth;
-
-            GameControler.instance.maxHealth = save.maxHealth;
+            GameControler.instance.AplicarCheckpointCarregado(
+                checkpointPos,
+                posicaoValida,
+                save.currentHealth,
+                save.maxHealth
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[Load][AplicarSave] Não foi possível aplicar o checkpoint: GameControler.instance ou CheckpointState.instance nulos."
+            );
         }
 
         ApplyCollectedInCurrentScene();
 
         EnemyState.instance?.AplicarEstadoNaCena();
+
+        Debug.Log("[Load][AplicarSave] Save aplicado com sucesso.");
     }
 
     float CalculateCompletionPercentage()

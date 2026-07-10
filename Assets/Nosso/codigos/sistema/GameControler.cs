@@ -505,6 +505,78 @@ public class GameControler : MonoBehaviour
             CheckpointState.instance.SetCheckpoint(checkpointId);
         }
     }
+
+    /// <summary>
+    /// Chamado pelo RemoteSaveService logo depois de aplicar um save
+    /// carregado (RemoteSaveService.AplicarSave). É aqui que o checkpoint
+    /// realmente vira "carregar o jogo": move o jogador para a posição
+    /// salva e restaura a vida no componente Damageable de verdade
+    /// (antes disso só existiam os campos health/maxHealth do GameControler,
+    /// que não têm nenhuma ligação com o Damageable do player).
+    /// </summary>
+    /// <param name="position">Posição do checkpoint a aplicar.</param>
+    /// <param name="posicaoValida">
+    /// true se a posição veio de CheckpointState.TryGetCheckpointPosition
+    /// (ou seja, o checkpoint já está registrado nesta cena). Se false, o
+    /// jogador não é movido (evita jogar o player para Vector3.zero).
+    /// </param>
+    public void AplicarCheckpointCarregado(
+        Vector3 position,
+        bool posicaoValida,
+        int currentHealth,
+        int maxHealthValue
+    )
+    {
+        Debug.Log(
+            $"[GameControler] AplicarCheckpointCarregado -> posicaoValida={posicaoValida} pos={position} vida={currentHealth}/{maxHealthValue}"
+        );
+
+        if (jogador == null)
+        {
+            Debug.LogWarning(
+                "[GameControler] Nao foi possivel aplicar o checkpoint carregado: referencia 'jogador' esta vazia no Inspector."
+            );
+            return;
+        }
+
+        if (posicaoValida)
+        {
+            lastCheckpoint = position;
+            hasCheckpoint = true;
+
+            jogador.SetActive(true);
+            jogador.transform.position = position;
+            Debug.Log($"[GameControler] Jogador reposicionado no checkpoint: {position}");
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[GameControler] Checkpoint carregado ainda nao tem posicao registrada nesta cena (nenhum CheckpointTrigger com esse ID rodou o Awake ainda). Jogador permanece na posicao padrao da cena."
+            );
+        }
+
+        Damageable dmg = jogador.GetComponent<Damageable>();
+        if (dmg != null && maxHealthValue > 0)
+        {
+            dmg.maxHealth = maxHealthValue;
+            dmg.currentHealth = Mathf.Clamp(currentHealth, 0, maxHealthValue);
+            dmg.OnHealthChanged?.Invoke((float)dmg.currentHealth / dmg.maxHealth);
+            Debug.Log(
+                $"[GameControler] Vida do jogador restaurada: {dmg.currentHealth}/{dmg.maxHealth}"
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[GameControler] Nao foi possivel restaurar a vida: Damageable nao encontrado no jogador ou maxHealth invalido."
+            );
+        }
+
+        // mantém os campos legados sincronizados, caso algo mais no projeto
+        // ainda leia GameControler.health/maxHealth diretamente.
+        health = currentHealth;
+        maxHealth = maxHealthValue;
+    }
     /*
        
         IEnumerator ensinar()
