@@ -557,24 +557,71 @@ public class RemoteSaveService : MonoBehaviour
         }
 
         payload.completionPercent = CalculateCompletionPercentage();
-        if (GameControler.instance != null)
+
+        // Vida: lê direto do Damageable real do jogador (não dos campos legados
+        // do GameControler, que nunca são atualizados durante o gameplay).
+        Damageable playerDmg = Player.player != null ? Player.player.GetComponent<Damageable>() : null;
+        if (playerDmg == null && GameControler.instance != null && GameControler.instance.jogador != null)
+            playerDmg = GameControler.instance.jogador.GetComponent<Damageable>();
+
+        if (playerDmg != null)
         {
+            payload.currentHealth = playerDmg.currentHealth;
+            payload.maxHealth = playerDmg.maxHealth;
+        }
+        else if (GameControler.instance != null)
+        {
+            Debug.LogWarning(
+                "[Save][BuildSavePayload] Damageable do jogador nao encontrado -> usando campos legados do GameControler."
+            );
             payload.currentHealth = GameControler.instance.health;
             payload.maxHealth = GameControler.instance.maxHealth;
         }
         else
         {
             Debug.LogWarning(
-                "[Save][BuildSavePayload] GameControler.instance é NULO -> usando vida padrao (100/100)."
+                "[Save][BuildSavePayload] Nenhuma fonte de vida encontrada -> usando padrao (100/100)."
             );
             payload.currentHealth = 100;
             payload.maxHealth = 100;
         }
 
+        // Coletáveis por tipo (cada contador é incrementado pelo respectivo
+        // script em codigos/coletaveis/* quando o item é pego).
+        if (GameControler.instance != null)
+        {
+            payload.qttAppleCollected = Mathf.RoundToInt(GameControler.instance.qttmaca);
+            payload.qttGlassCollected = Mathf.RoundToInt(GameControler.instance.qttgarrafa);
+            payload.qttPlasticCollected = Mathf.RoundToInt(GameControler.instance.qttPlastico);
+            payload.qttElectronicsCollected = Mathf.RoundToInt(GameControler.instance.qttcircuito);
+            payload.qttPaperCollected = Mathf.RoundToInt(GameControler.instance.qttPapel);
+            payload.qttMetalCollected = Mathf.RoundToInt(GameControler.instance.qttengrenagem);
+
+            payload.deathCount = GameControler.instance.deathCount;
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[Save][BuildSavePayload] GameControler.instance é NULO -> coletaveis e deathCount sairao zerados."
+            );
+        }
+
+        // Score total = soma de tudo que foi coletado (cada Coletavel soma seu
+        // proprio "score" ao respectivo contador, entao a soma dos contadores
+        // já representa a pontuação total do jogador).
+        payload.score =
+            payload.qttAppleCollected
+            + payload.qttGlassCollected
+            + payload.qttPlasticCollected
+            + payload.qttElectronicsCollected
+            + payload.qttPaperCollected
+            + payload.qttMetalCollected;
+
         Debug.Log(
             $"[Save][BuildSavePayload] Payload final -> slot={payload.slotIndex} cena={payload.sceneName} "
                 + $"checkpointId='{payload.checkpointId}' coletados={payload.collectedIds.Count} "
                 + $"inimigosMortos={payload.deadEnemyIds.Count} vida={payload.currentHealth}/{payload.maxHealth} "
+                + $"mortes={payload.deathCount} score={payload.score} "
                 + $"completude={payload.completionPercent:0.##}%"
         );
 
@@ -653,7 +700,24 @@ public class RemoteSaveService : MonoBehaviour
                 checkpointPos,
                 posicaoValida,
                 save.currentHealth,
-                save.maxHealth
+                save.maxHealth,
+                save.deathCount
+            );
+
+            // Restaura os contadores de coletáveis por tipo (apple/glass/plastic/
+            // electronics/paper/metal), usados pela HUD e pelo cálculo de score.
+            GameControler.instance.qttmaca = save.qttAppleCollected;
+            GameControler.instance.qttgarrafa = save.qttGlassCollected;
+            GameControler.instance.qttPlastico = save.qttPlasticCollected;
+            GameControler.instance.qttcircuito = save.qttElectronicsCollected;
+            GameControler.instance.qttPapel = save.qttPaperCollected;
+            GameControler.instance.qttengrenagem = save.qttMetalCollected;
+
+            Debug.Log(
+                $"[Load][AplicarSave] Coletaveis restaurados -> maca={save.qttAppleCollected} "
+                    + $"garrafa={save.qttGlassCollected} plastico={save.qttPlasticCollected} "
+                    + $"circuito={save.qttElectronicsCollected} papel={save.qttPaperCollected} "
+                    + $"engrenagem={save.qttMetalCollected} mortes={save.deathCount} score={save.score}"
             );
         }
         else

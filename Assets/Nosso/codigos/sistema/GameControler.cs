@@ -67,6 +67,10 @@ public class GameControler : MonoBehaviour
     [HideInInspector]
     public float health = 10;
 
+    /// <summary>Quantas vezes o jogador já morreu nesta partida (persistido no save).</summary>
+    [HideInInspector]
+    public int deathCount = 0;
+
     /*
         private bool canPassStage = true; // Controla se é possível passar de fase
         public float passStageCooldown = 1f;
@@ -362,6 +366,7 @@ public class GameControler : MonoBehaviour
             return;
 
         gameOverTriggered = true;
+        deathCount++;
         PlayPlayerDeathSound();
         ShowGameOver();
         if (jogador != null)
@@ -524,12 +529,15 @@ public class GameControler : MonoBehaviour
         Vector3 position,
         bool posicaoValida,
         int currentHealth,
-        int maxHealthValue
+        int maxHealthValue,
+        int deathCountValue = 0
     )
     {
         Debug.Log(
-            $"[GameControler] AplicarCheckpointCarregado -> posicaoValida={posicaoValida} pos={position} vida={currentHealth}/{maxHealthValue}"
+            $"[GameControler] AplicarCheckpointCarregado -> posicaoValida={posicaoValida} pos={position} vida={currentHealth}/{maxHealthValue} mortes={deathCountValue}"
         );
+
+        deathCount = deathCountValue;
 
         if (jogador == null)
         {
